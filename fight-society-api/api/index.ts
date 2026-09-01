@@ -2,20 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
-import express, { Express, Request, Response } from 'express';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import express, { Express, Request, Response } from 'express';
 import { AppModule } from '../src/app.module';
 
-const server: Express = express();
+let cachedHandler: ((req: Request, res: Response) => void) | null = null;
 
-export const createServer = async (expressInstance: Express) => {
-  const app = await NestFactory.create(
-    AppModule,
-    new ExpressAdapter(expressInstance),
-    {
-      rawBody: true,
-    },
-  );
+async function bootstrap(): Promise<(req: Request, res: Response) => void> {
+  const expressApp: Express = express();
+  const adapter = new ExpressAdapter(expressApp);
+
+  const app = await NestFactory.create(AppModule, adapter, {
+    rawBody: true,
+  });
 
   app.setGlobalPrefix('api');
 
@@ -62,25 +61,21 @@ export const createServer = async (expressInstance: Express) => {
   SwaggerModule.setup('api/docs', app, document);
 
   await app.init();
-  return app;
-};
-
-let cachedServer = false;
+  return expressApp;
+}
 
 export default async function handler(req: Request, res: Response) {
   try {
-    if (!cachedServer) {
-      await createServer(server);
-      cachedServer = true;
+    if (!cachedHandler) {
+      cachedHandler = await bootstrap();
     }
-    server(req, res);
+    return cachedHandler(req, res);
   } catch (error: any) {
-    console.error('Serverless Function Error:', error);
-    res.status(500).json({
+    console.error('Serverless Initialization Error:', error);
+    return res.status(500).json({
       success: false,
       message: 'Serverless initialization error',
       error: error?.message || String(error),
-      stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined,
     });
   }
 }
