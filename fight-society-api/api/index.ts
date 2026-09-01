@@ -68,9 +68,19 @@ export const createServer = async (expressInstance: Express) => {
 let cachedServer = false;
 
 export default async function handler(req: Request, res: Response) {
-  if (!cachedServer) {
-    await createServer(server);
-    cachedServer = true;
+  try {
+    if (!cachedServer) {
+      await createServer(server);
+      cachedServer = true;
+    }
+    server(req, res);
+  } catch (error: any) {
+    console.error('Serverless Function Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Serverless initialization error',
+      error: error?.message || String(error),
+      stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined,
+    });
   }
-  server(req, res);
 }
