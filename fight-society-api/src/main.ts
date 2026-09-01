@@ -1,0 +1,63 @@
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import helmet from 'helmet';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true, // Required for Stripe webhook signature verification
+  });
+
+  // Global prefix
+  app.setGlobalPrefix('api');
+
+  // Security headers
+  app.use(helmet());
+
+  // CORS
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,
+  });
+
+  // Global validation pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
+
+  // Swagger / OpenAPI documentation
+  const config = new DocumentBuilder()
+    .setTitle('Fight Society API')
+    .setDescription(
+      'API para gerenciamento de academia de artes marciais — Jiu Jitsu e Muay Thai. ' +
+      'Gerencia matrículas, planos, pagamentos via Stripe e autenticação JWT.',
+    )
+    .setVersion('1.0.0')
+    .addBearerAuth()
+    .addTag('Auth', 'Autenticação e registro')
+    .addTag('Users', 'Gerenciamento de usuários')
+    .addTag('Plans', 'Planos de treino')
+    .addTag('Enrollments', 'Matrículas')
+    .addTag('Payments', 'Pagamentos via Stripe')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+
+  console.log(`🥊 Fight Society API running on http://localhost:${port}`);
+  console.log(`📚 Swagger docs: http://localhost:${port}/api/docs`);
+}
+
+bootstrap();

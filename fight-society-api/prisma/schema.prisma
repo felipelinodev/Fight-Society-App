@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Enums
+// ============================================
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum MartialArt {
+  JIU_JITSU
+  MUAY_THAI
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+}
+
+// ============================================
+// Models
+// ============================================
+
+model User {
+  id                 String   @id @default(uuid())
+  name               String
+  email              String   @unique
+  passwordHash       String   @map("password_hash")
+  phone              String?
+  cpf                String?  @unique
+  role               Role     @default(STUDENT)
+  stripeCustomerId   String?  @unique @map("stripe_customer_id")
+  active             Boolean  @default(true)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  enrollments Enrollment[]
+  payments    Payment[]
+
+  @@map("users")
+}
+
+model Plan {
+  id              String     @id @default(uuid())
+  name            String
+  description     String?
+  martialArt      MartialArt @map("martial_art")
+  price           Decimal    @db.Decimal(10, 2)
+  durationDays    Int        @map("duration_days")
+  stripePriceId   String?    @unique @map("stripe_price_id")
+  active          Boolean    @default(true)
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  enrollments Enrollment[]
+
+  @@map("plans")
+}
+
+model Enrollment {
+  id                    String           @id @default(uuid())
+  userId                String           @map("user_id")
+  planId                String           @map("plan_id")
+  status                EnrollmentStatus @default(ACTIVE)
+  stripeSubscriptionId  String?          @unique @map("stripe_subscription_id")
+  startDate             DateTime         @default(now()) @map("start_date")
+  endDate               DateTime?        @map("end_date")
+  createdAt             DateTime         @default(now()) @map("created_at")
+  updatedAt             DateTime         @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id])
+  plan     Plan      @relation(fields: [planId], references: [id])
+  payments Payment[]
+
+  @@map("enrollments")
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  userId                String        @map("user_id")
+  enrollmentId          String        @map("enrollment_id")
+  amount                Decimal       @db.Decimal(10, 2)
+  status                PaymentStatus @default(PENDING)
+  method                PaymentMethod?
+  stripePaymentIntentId String?       @unique @map("stripe_payment_intent_id")
+  stripeInvoiceId       String?       @unique @map("stripe_invoice_id")
+  paidAt                DateTime?     @map("paid_at")
+  createdAt             DateTime      @default(now()) @map("created_at")
+
+  user       User       @relation(fields: [userId], references: [id])
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id])
+
+  @@map("payments")
+}
