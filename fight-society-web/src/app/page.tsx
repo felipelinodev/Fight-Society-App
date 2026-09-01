@@ -8,6 +8,7 @@ import { MemberCard } from '@/components/MemberCard';
 import { StudentsManagement } from '@/components/StudentsManagement';
 import { PlansSection } from '@/components/PlansSection';
 import { PaymentsHistory } from '@/components/PaymentsHistory';
+import { ScheduleSection } from '@/components/ScheduleSection';
 import { BottomNav, TabType } from '@/components/BottomNav';
 import { AuthModal } from '@/components/AuthModal';
 import {
@@ -340,14 +341,21 @@ export default function Home() {
           </div>
         )}
 
-        {/* TAB 4: FINANCEIRO & COBRANÇAS STRIPE */}
-        {currentTab === 'payments' && (
+        {/* TAB 4: FINANCEIRO & COBRANÇAS STRIPE (Apenas para ADMIN) */}
+        {currentTab === 'payments' && isAdmin && (
           <div className="animate-in fade-in duration-300">
             <PaymentsHistory />
           </div>
         )}
 
-        {/* TAB 5: PERFIL DO ALUNO (Apenas para STUDENT) */}
+        {/* TAB 5: HORÁRIOS & GRADE DE AULAS (Para ALUNO) */}
+        {currentTab === 'schedule' && (
+          <div className="animate-in fade-in duration-300">
+            <ScheduleSection />
+          </div>
+        )}
+
+        {/* TAB 6: PERFIL DO ALUNO (Apenas para STUDENT) */}
         {currentTab === 'profile' && user && !isAdmin && (
           <div className="space-y-5 animate-in fade-in duration-300">
             <div className="p-6 rounded-3xl bg-white border border-slate-200 text-center shadow-xs">
