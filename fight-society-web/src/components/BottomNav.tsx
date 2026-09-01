@@ -24,11 +24,10 @@ export function BottomNav({ currentTab, onSelectTab, onCenterClick }: BottomNavP
           {/* Left: Meu Passe */}
           <button
             onClick={() => onSelectTab('home')}
-            className={`p-2.5 rounded-full transition-all ${
-              currentTab === 'home'
+            className={`p-2.5 rounded-full transition-all ${currentTab === 'home'
                 ? 'bg-white/15 text-red-500 scale-105'
                 : 'text-slate-400 hover:text-white'
-            }`}
+              }`}
             title="Meu Passe"
           >
             <LayoutDashboard size={21} className={currentTab === 'home' ? 'stroke-[2.5]' : 'stroke-2'} />
@@ -46,11 +45,10 @@ export function BottomNav({ currentTab, onSelectTab, onCenterClick }: BottomNavP
           {/* Right: Planos */}
           <button
             onClick={() => onSelectTab('plans')}
-            className={`p-2.5 rounded-full transition-all ${
-              currentTab === 'plans'
+            className={`p-2.5 rounded-full transition-all ${currentTab === 'plans'
                 ? 'bg-white/15 text-red-500 scale-105'
                 : 'text-slate-400 hover:text-white'
-            }`}
+              }`}
             title="Planos de Treino"
           >
             <Swords size={21} className={currentTab === 'plans' ? 'stroke-[2.5]' : 'stroke-2'} />
@@ -67,11 +65,10 @@ export function BottomNav({ currentTab, onSelectTab, onCenterClick }: BottomNavP
         {/* Admin 1: Home */}
         <button
           onClick={() => onSelectTab('home')}
-          className={`p-2.5 rounded-full transition-all ${
-            currentTab === 'home'
+          className={`p-2.5 rounded-full transition-all ${currentTab === 'home'
               ? 'bg-white/15 text-red-500 scale-105'
               : 'text-slate-400 hover:text-white'
-          }`}
+            }`}
           title="Painel Geral"
         >
           <LayoutDashboard size={20} className={currentTab === 'home' ? 'stroke-[2.5]' : 'stroke-2'} />
@@ -80,11 +77,10 @@ export function BottomNav({ currentTab, onSelectTab, onCenterClick }: BottomNavP
         {/* Admin 2: Alunos */}
         <button
           onClick={() => onSelectTab('students')}
-          className={`p-2.5 rounded-full transition-all ${
-            currentTab === 'students'
+          className={`p-2.5 rounded-full transition-all ${currentTab === 'students'
               ? 'bg-white/15 text-red-500 scale-105'
               : 'text-slate-400 hover:text-white'
-          }`}
+            }`}
           title="Gestão de Alunos"
         >
           <Users size={20} className={currentTab === 'students' ? 'stroke-[2.5]' : 'stroke-2'} />
@@ -102,11 +98,10 @@ export function BottomNav({ currentTab, onSelectTab, onCenterClick }: BottomNavP
         {/* Admin 4: Planos */}
         <button
           onClick={() => onSelectTab('plans')}
-          className={`p-2.5 rounded-full transition-all ${
-            currentTab === 'plans'
+          className={`p-2.5 rounded-full transition-all ${currentTab === 'plans'
               ? 'bg-white/15 text-red-500 scale-105'
               : 'text-slate-400 hover:text-white'
-          }`}
+            }`}
           title="Gerenciar Planos"
         >
           <Swords size={20} className={currentTab === 'plans' ? 'stroke-[2.5]' : 'stroke-2'} />
@@ -115,11 +110,10 @@ export function BottomNav({ currentTab, onSelectTab, onCenterClick }: BottomNavP
         {/* Admin 5: Financeiro */}
         <button
           onClick={() => onSelectTab('payments')}
-          className={`p-2.5 rounded-full transition-all ${
-            currentTab === 'payments'
+          className={`p-2.5 rounded-full transition-all ${currentTab === 'payments'
               ? 'bg-white/15 text-red-500 scale-105'
               : 'text-slate-400 hover:text-white'
-          }`}
+            }`}
           title="Financeiro"
         >
           <CreditCard size={20} className={currentTab === 'payments' ? 'stroke-[2.5]' : 'stroke-2'} />

@@ -81,14 +81,26 @@ export class PaymentService {
       });
     }
 
+    // Determine safe base URL for Stripe redirect
+    const corsOrigin = process.env.CORS_ORIGIN;
+    let baseUrl = 'http://localhost:3001';
+
+    if (process.env.FRONTEND_URL && process.env.FRONTEND_URL.startsWith('http')) {
+      baseUrl = process.env.FRONTEND_URL;
+    } else if (corsOrigin && corsOrigin !== '*' && corsOrigin.startsWith('http')) {
+      baseUrl = corsOrigin;
+    } else if (corsOrigin && corsOrigin !== '*' && !corsOrigin.startsWith('http')) {
+      baseUrl = `https://${corsOrigin}`;
+    }
+
     // Create checkout session
     const session = await this.stripeService.createCheckoutSession({
       customerId: stripeCustomerId,
       priceAmount: Number(enrollment.plan.price),
       productName: enrollment.plan.name,
       enrollmentId,
-      successUrl: `${process.env.CORS_ORIGIN || 'http://localhost:3000'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${process.env.CORS_ORIGIN || 'http://localhost:3000'}/payment/cancel`,
+      successUrl: `${baseUrl}/?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: `${baseUrl}/?payment=cancel`,
     });
 
     // Create pending payment record
