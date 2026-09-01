@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { validate } from './config/env.validation';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -20,16 +19,6 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
-    }),
-
-    // Rate limiting
-    ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          ttl: 60000,
-          limit: 30,
-        },
-      ],
     }),
 
     // Database
@@ -52,11 +41,6 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
-    },
-    // Global rate limiting guard
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
     },
     // Global exception filter
     {
