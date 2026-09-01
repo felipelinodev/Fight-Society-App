@@ -37,6 +37,7 @@ const DEFAULT_FALLBACK_PLANS: Plan[] = [
     durationDays: 30,
     martialArt: 'JIU_JITSU',
     active: true,
+    createdAt: new Date().toISOString(),
   },
   {
     id: 'bjj-trimestral',
@@ -46,6 +47,7 @@ const DEFAULT_FALLBACK_PLANS: Plan[] = [
     durationDays: 90,
     martialArt: 'JIU_JITSU',
     active: true,
+    createdAt: new Date().toISOString(),
   },
   {
     id: 'muay-mensal',
@@ -55,6 +57,7 @@ const DEFAULT_FALLBACK_PLANS: Plan[] = [
     durationDays: 30,
     martialArt: 'MUAY_THAI',
     active: true,
+    createdAt: new Date().toISOString(),
   },
   {
     id: 'thai-trimestral',
@@ -64,17 +67,18 @@ const DEFAULT_FALLBACK_PLANS: Plan[] = [
     durationDays: 90,
     martialArt: 'MUAY_THAI',
     active: true,
+    createdAt: new Date().toISOString(),
   },
 ];
 
 export default function Home() {
   const { user, token, logout, isLoading } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  
+
   const [currentTab, setCurrentTab] = useState<TabType>('home');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  
+
   // Data from API
   const [plans, setPlans] = useState<Plan[]>(DEFAULT_FALLBACK_PLANS);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
@@ -104,8 +108,8 @@ export default function Home() {
   // Load user data if logged in
   useEffect(() => {
     if (token && user) {
-      api.getMyEnrollments(token).then(setEnrollments).catch(() => {});
-      api.getMyPayments(token).then(setPayments).catch(() => {});
+      api.getMyEnrollments(token).then(setEnrollments).catch(() => { });
+      api.getMyPayments(token).then(setPayments).catch(() => { });
     }
   }, [token, user]);
 

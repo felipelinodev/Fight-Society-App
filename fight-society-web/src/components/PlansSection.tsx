@@ -173,6 +173,7 @@ export function PlansSection({
           {
             name: planName,
             description: planDescription,
+            martialArt: planMartialArt,
             price: priceNum,
             durationDays: durationNum,
           },
@@ -426,8 +427,9 @@ export function PlansSection({
               </div>
             </div>
           );
-        })}
-      </div>
+        })
+      )}
+    </div>
 
       {/* Create / Edit Plan Modal (Integrated directly in Plans Section) */}
       {showPlanModal && (
