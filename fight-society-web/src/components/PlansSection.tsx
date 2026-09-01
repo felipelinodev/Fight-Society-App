@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import { Plan, MartialArt } from '@/types/api';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import { Shield, Zap, Check, ArrowRight, Sparkles, Plus, Edit2, Flame, Swords, Trash2, QrCode } from 'lucide-react';
-import { PixCheckoutModal } from './PixCheckoutModal';
+import { Shield, Zap, Check, ArrowRight, Sparkles, Plus, Edit2, Flame, Swords, Trash2 } from 'lucide-react';
 
 interface PlansSectionProps {
   plans: Plan[];
@@ -26,9 +25,6 @@ export function PlansSection({
   const [selectedArt, setSelectedArt] = useState<'ALL' | MartialArt>('ALL');
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  // Pix / Card Checkout Modal State
-  const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
 
   // Edit / Create Plan Modal State
   const [showPlanModal, setShowPlanModal] = useState(false);
@@ -86,29 +82,24 @@ export function PlansSection({
     return art === selectedArt;
   });
 
-  const handleEnrollClick = (plan: Plan) => {
+  const handleEnrollClick = async (plan: Plan) => {
     if (!user || !token) {
       onOpenAuth();
       return;
     }
-    setCheckoutPlan(plan);
-  };
-
-  const handleStripeCheckout = async () => {
-    if (!checkoutPlan || !user || !token) return;
 
     setErrorMsg(null);
-    setLoadingPlanId(checkoutPlan.id);
+    setLoadingPlanId(plan.id);
 
     try {
       // 1. Get or create enrollment
       let userEnrollments = await api.getMyEnrollments(token);
       let enrollment = userEnrollments.find(
-        (e) => e.planId === checkoutPlan.id,
+        (e) => e.planId === plan.id,
       );
 
       if (!enrollment) {
-        enrollment = await api.createEnrollment(user.id, checkoutPlan.id, token);
+        enrollment = await api.createEnrollment(user.id, plan.id, token);
       }
 
       // 2. Create Stripe checkout session
@@ -601,16 +592,6 @@ export function PlansSection({
           </div>
         </div>
       )}
-
-      {/* Pix / Card Payment Choice Modal */}
-      <PixCheckoutModal
-        isOpen={!!checkoutPlan}
-        plan={checkoutPlan}
-        onClose={() => setCheckoutPlan(null)}
-        onPayWithCard={handleStripeCheckout}
-        onEnrollmentSuccess={onEnrollmentSuccess}
-        isCardLoading={loadingPlanId === checkoutPlan?.id}
-      />
     </div>
   );
 }

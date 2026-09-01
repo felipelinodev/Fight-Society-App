@@ -36,7 +36,6 @@ export class StripeService {
     return this.stripe.checkout.sessions.create({
       customer: params.customerId,
       mode: 'payment',
-      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
