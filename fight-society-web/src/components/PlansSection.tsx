@@ -61,7 +61,29 @@ export function PlansSection({
 
   const filteredPlans = plans.filter((plan) => {
     if (selectedArt === 'ALL') return true;
-    return plan.martialArt === selectedArt;
+    const art = (plan.martialArt || '').toUpperCase();
+    const name = (plan.name || '').toUpperCase();
+
+    if (selectedArt === 'JIU_JITSU') {
+      return (
+        art === 'JIU_JITSU' ||
+        name.includes('JIU') ||
+        name.includes('BJJ') ||
+        name.includes('KIMONO') ||
+        art === ''
+      );
+    }
+
+    if (selectedArt === 'MUAY_THAI') {
+      return (
+        art === 'MUAY_THAI' ||
+        name.includes('THAI') ||
+        name.includes('MUAY') ||
+        name.includes('BOXE')
+      );
+    }
+
+    return art === selectedArt;
   });
 
   const handleEnrollClick = (plan: Plan) => {
@@ -264,7 +286,26 @@ export function PlansSection({
 
       {/* Plan Cards Grid */}
       <div className="grid grid-cols-1 gap-4">
-        {filteredPlans.map((plan) => {
+        {filteredPlans.length === 0 ? (
+          <div className="p-8 bg-white rounded-3xl border border-slate-200/80 text-center space-y-3 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto">
+              <Swords size={22} />
+            </div>
+            <div>
+              <h4 className="text-sm font-black text-slate-900">Nenhum plano encontrado</h4>
+              <p className="text-xs text-slate-500 mt-1">
+                Não há planos cadastrados para este filtro no momento.
+              </p>
+            </div>
+            <button
+              onClick={() => setSelectedArt('ALL')}
+              className="py-2 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition"
+            >
+              Ver Todos os Planos
+            </button>
+          </div>
+        ) : (
+          filteredPlans.map((plan) => {
           const isBJJ = plan.martialArt === 'JIU_JITSU';
           const isQuarterly = plan.durationDays >= 90 && plan.durationDays < 180;
           const isSemiAnnual = plan.durationDays >= 180;

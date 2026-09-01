@@ -28,6 +28,45 @@ import {
   Shield,
 } from 'lucide-react';
 
+const DEFAULT_FALLBACK_PLANS: Plan[] = [
+  {
+    id: 'bjj-mensal',
+    name: 'Jiu Jitsu Mensal',
+    description: 'Acesso completo a todas as turmas de Jiu Jitsu (Gi e No-Gi)',
+    price: 150.0,
+    durationDays: 30,
+    martialArt: 'JIU_JITSU',
+    active: true,
+  },
+  {
+    id: 'bjj-trimestral',
+    name: 'Jiu Jitsu Trimestral',
+    description: 'Acesso trimestral com desconto exclusivo',
+    price: 390.0,
+    durationDays: 90,
+    martialArt: 'JIU_JITSU',
+    active: true,
+  },
+  {
+    id: 'muay-mensal',
+    name: 'Muay Thai Mensal',
+    description: 'Treinos de Muay Thai de segunda a sexta com Kru certificado',
+    price: 140.0,
+    durationDays: 30,
+    martialArt: 'MUAY_THAI',
+    active: true,
+  },
+  {
+    id: 'thai-trimestral',
+    name: 'Muay Thai Trimestral',
+    description: 'Treino intensivo trimestral com foco em técnica e condicionamento',
+    price: 360.0,
+    durationDays: 90,
+    martialArt: 'MUAY_THAI',
+    active: true,
+  },
+];
+
 export default function Home() {
   const { user, token, logout, isLoading } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -37,15 +76,24 @@ export default function Home() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   
   // Data from API
-  const [plans, setPlans] = useState<Plan[]>([]);
+  const [plans, setPlans] = useState<Plan[]>(DEFAULT_FALLBACK_PLANS);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
 
   const refreshPlans = () => {
     api
       .getPlans(token)
-      .then((data) => setPlans(data || []))
-      .catch((e) => console.error('Erro ao carregar planos', e));
+      .then((data) => {
+        if (data && data.length > 0) {
+          setPlans(data);
+        } else {
+          setPlans(DEFAULT_FALLBACK_PLANS);
+        }
+      })
+      .catch((e) => {
+        console.error('Erro ao carregar planos', e);
+        setPlans(DEFAULT_FALLBACK_PLANS);
+      });
   };
 
   // Load public plans
