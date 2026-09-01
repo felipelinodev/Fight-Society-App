@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { Plan, MartialArt } from '@/types/api';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import { Shield, Zap, Check, ArrowRight, Sparkles, Plus, Edit2, Flame, Swords, Trash2 } from 'lucide-react';
+import { Shield, Zap, Check, ArrowRight, Sparkles, Plus, Edit2, Flame, Swords, Trash2, QrCode } from 'lucide-react';
+import { PixCheckoutModal } from './PixCheckoutModal';
 
 interface PlansSectionProps {
   plans: Plan[];
@@ -25,6 +26,9 @@ export function PlansSection({
   const [selectedArt, setSelectedArt] = useState<'ALL' | MartialArt>('ALL');
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Pix / Card Checkout Modal State
+  const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
 
   // Edit / Create Plan Modal State
   const [showPlanModal, setShowPlanModal] = useState(false);
@@ -60,24 +64,29 @@ export function PlansSection({
     return plan.martialArt === selectedArt;
   });
 
-  const handleEnrollAndPay = async (plan: Plan) => {
+  const handleEnrollClick = (plan: Plan) => {
     if (!user || !token) {
       onOpenAuth();
       return;
     }
+    setCheckoutPlan(plan);
+  };
+
+  const handleStripeCheckout = async () => {
+    if (!checkoutPlan || !user || !token) return;
 
     setErrorMsg(null);
-    setLoadingPlanId(plan.id);
+    setLoadingPlanId(checkoutPlan.id);
 
     try {
       // 1. Get or create enrollment
       let userEnrollments = await api.getMyEnrollments(token);
       let enrollment = userEnrollments.find(
-        (e) => e.planId === plan.id,
+        (e) => e.planId === checkoutPlan.id,
       );
 
       if (!enrollment) {
-        enrollment = await api.createEnrollment(user.id, plan.id, token);
+        enrollment = await api.createEnrollment(user.id, checkoutPlan.id, token);
       }
 
       // 2. Create Stripe checkout session
@@ -356,7 +365,7 @@ export function PlansSection({
                 </div>
 
                 <button
-                  onClick={() => handleEnrollAndPay(plan)}
+                  onClick={() => handleEnrollClick(plan)}
                   disabled={loadingPlanId === plan.id}
                   className={`py-3 px-5 rounded-2xl font-bold text-xs flex items-center gap-2 transition transform active:scale-95 shadow-md ${
                     isPopular
@@ -549,6 +558,15 @@ export function PlansSection({
           </div>
         </div>
       )}
+
+      {/* Pix / Card Payment Choice Modal */}
+      <PixCheckoutModal
+        isOpen={!!checkoutPlan}
+        plan={checkoutPlan}
+        onClose={() => setCheckoutPlan(null)}
+        onPayWithCard={handleStripeCheckout}
+        isCardLoading={loadingPlanId === checkoutPlan?.id}
+      />
     </div>
   );
 }

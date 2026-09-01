@@ -40,7 +40,6 @@ export default function Home() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [showQrModal, setShowQrModal] = useState(false);
 
   const refreshPlans = () => {
     api
@@ -111,19 +110,11 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowQrModal(true)}
-              className="p-2.5 rounded-2xl bg-white border border-slate-200/80 text-slate-700 hover:text-red-600 hover:border-red-200 transition shadow-xs"
-              title="QR Code de Acesso"
-            >
-              <QrCode size={18} />
-            </button>
-
             {user ? (
               <button
                 onClick={logout}
                 className="p-2.5 rounded-2xl bg-white border border-slate-200/80 text-slate-400 hover:text-red-600 hover:border-red-200 transition shadow-xs"
-                title="Sair"
+                title="Sair da Conta"
               >
                 <LogOut size={18} />
               </button>
@@ -234,7 +225,7 @@ export default function Home() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setCurrentTab('plans')}
                   className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-2 group transition text-center"
@@ -253,16 +244,6 @@ export default function Home() {
                     <UserIcon size={18} />
                   </div>
                   <span className="text-xs font-bold text-slate-800">Meu Perfil</span>
-                </button>
-
-                <button
-                  onClick={() => setShowQrModal(true)}
-                  className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-2 group transition text-center"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition">
-                    <QrCode size={18} />
-                  </div>
-                  <span className="text-xs font-bold text-slate-800">Catraca</span>
                 </button>
               </div>
             )}
@@ -404,53 +385,7 @@ export default function Home() {
       <BottomNav
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
-        onCenterClick={() => setShowQrModal(true)}
       />
-
-      {/* Turnstile Access QR Code Modal */}
-      {showQrModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-xs bg-white rounded-3xl p-6 text-center shadow-2xl border border-red-100">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-4">
-              <QrCode size={26} />
-            </div>
-            <h3 className="text-lg font-black text-slate-900">Catraca de Entrada</h3>
-            <p className="text-xs text-slate-500 mt-1 mb-4">
-              Aproxime este código do leitor da academia para liberar seu acesso ao dojô.
-            </p>
-
-            <div className="w-44 h-44 mx-auto bg-slate-900 rounded-2xl p-3 flex items-center justify-center shadow-inner">
-              <div className="w-full h-full bg-white rounded-xl flex flex-col items-center justify-center p-2">
-                <div className="grid grid-cols-6 gap-1 w-28 h-28 p-1">
-                  {Array.from({ length: 36 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={`rounded-xs ${
-                        (i % 2 === 0 && i % 3 === 0) || i === 0 || i === 5 || i === 30 || i === 35
-                          ? 'bg-black'
-                          : i % 4 === 0
-                          ? 'bg-red-600'
-                          : 'bg-slate-200'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 text-[11px] font-bold text-slate-400 font-mono">
-              {user ? `ALUNO: ${user.name.toUpperCase()}` : 'FIGHT SOCIETY PASS'}
-            </div>
-
-            <button
-              onClick={() => setShowQrModal(false)}
-              className="mt-5 w-full py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Auth Modal (Login / Register) */}
       <AuthModal
