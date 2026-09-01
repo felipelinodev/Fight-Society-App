@@ -61,10 +61,6 @@ export class PaymentService {
       );
     }
 
-    if (enrollment.status !== EnrollmentStatus.ACTIVE) {
-      throw new BadRequestException('Enrollment is not active');
-    }
-
     // Ensure user has a Stripe customer ID
     let stripeCustomerId = enrollment.user.stripeCustomerId;
 
@@ -168,8 +164,21 @@ export class PaymentService {
       }
     }
 
+    // Activate enrollment upon confirmed payment
+    try {
+      await this.prisma.enrollment.update({
+        where: { id: enrollmentId },
+        data: {
+          status: EnrollmentStatus.ACTIVE,
+          startDate: new Date(),
+        },
+      });
+    } catch (e) {
+      this.logger.error(`Error activating enrollment ${enrollmentId}:`, e);
+    }
+
     this.logger.log(
-      `Checkout completed for enrollment: ${enrollmentId}`,
+      `Checkout completed & enrollment activated: ${enrollmentId}`,
     );
   }
 

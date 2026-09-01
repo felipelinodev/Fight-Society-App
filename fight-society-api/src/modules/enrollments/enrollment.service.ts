@@ -43,7 +43,7 @@ export class EnrollmentService {
     return enrollment;
   }
 
-  async create(userId: string, planId: string) {
+  async create(userId: string, planId: string, status: EnrollmentStatus = EnrollmentStatus.INACTIVE) {
     // Validate user exists
     await this.userService.findById(userId);
 
@@ -66,6 +66,15 @@ export class EnrollmentService {
       );
     }
 
+    // Check for existing pending enrollment to reuse
+    const existingPending = userEnrollments.find(
+      (e) => e.planId === planId && e.status === EnrollmentStatus.INACTIVE,
+    );
+
+    if (existingPending) {
+      return existingPending;
+    }
+
     // Calculate end date
     const startDate = new Date();
     const endDate = new Date(startDate);
@@ -74,7 +83,7 @@ export class EnrollmentService {
     return this.enrollmentRepository.create({
       userId,
       planId,
-      status: EnrollmentStatus.ACTIVE,
+      status,
       startDate,
       endDate,
     });
