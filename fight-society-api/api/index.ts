@@ -3,16 +3,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import express, { Express, Request, Response } from 'express';
+import express, { Express } from 'express';
 import { AppModule } from '../src/app.module';
 
-let cachedHandler: ((req: Request, res: Response) => void) | null = null;
+let cachedServer: Express | null = null;
 
-async function bootstrap(): Promise<(req: Request, res: Response) => void> {
-  const expressApp: Express = express();
-  const adapter = new ExpressAdapter(expressApp);
-
-  const app = await NestFactory.create(AppModule, adapter, {
+async function bootstrap(): Promise<Express> {
+  const server = express();
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
     rawBody: true,
   });
 
@@ -61,21 +59,12 @@ async function bootstrap(): Promise<(req: Request, res: Response) => void> {
   SwaggerModule.setup('api/docs', app, document);
 
   await app.init();
-  return expressApp;
+  return server;
 }
 
-export default async function handler(req: Request, res: Response) {
-  try {
-    if (!cachedHandler) {
-      cachedHandler = await bootstrap();
-    }
-    return cachedHandler(req, res);
-  } catch (error: any) {
-    console.error('Serverless Initialization Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Serverless initialization error',
-      error: error?.message || String(error),
-    });
+export default async function handler(req: any, res: any) {
+  if (!cachedServer) {
+    cachedServer = await bootstrap();
   }
+  return cachedServer(req, res);
 }
