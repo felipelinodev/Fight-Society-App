@@ -16,10 +16,11 @@ export class StripeService {
   }
 
   async createCustomer(email: string, name: string): Promise<Stripe.Customer> {
+    const appName = this.configService.get<string>('APP_NAME', 'Martial Arts Academy');
     return this.stripe.customers.create({
       email,
       name,
-      metadata: { source: 'fight-society-api' },
+      metadata: { source: appName },
     });
   }
 
@@ -31,6 +32,7 @@ export class StripeService {
     successUrl: string;
     cancelUrl: string;
   }): Promise<Stripe.Checkout.Session> {
+    const appName = this.configService.get<string>('APP_NAME', 'Martial Arts Academy');
     return this.stripe.checkout.sessions.create({
       customer: params.customerId,
       mode: 'payment',
@@ -41,7 +43,7 @@ export class StripeService {
             currency: 'brl',
             product_data: {
               name: params.productName,
-              description: `Fight Society - ${params.productName}`,
+              description: `${appName} - ${params.productName}`,
             },
             unit_amount: Math.round(params.priceAmount * 100), // Stripe uses cents
           },

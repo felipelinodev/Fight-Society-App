@@ -22,6 +22,10 @@ class EnvironmentVariables {
   PORT: number = 3000;
 
   @IsString()
+  @IsOptional()
+  APP_NAME: string = 'Martial Arts API';
+
+  @IsString()
   DATABASE_URL!: string;
 
   @IsString()

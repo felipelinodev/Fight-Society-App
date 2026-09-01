@@ -34,9 +34,11 @@ async function bootstrap() {
     }),
   );
 
+  const appName = process.env.APP_NAME || 'Martial Arts Academy API';
+
   // Swagger / OpenAPI documentation
   const config = new DocumentBuilder()
-    .setTitle('Fight Society API')
+    .setTitle(appName)
     .setDescription(
       'API para gerenciamento de academia de artes marciais — Jiu Jitsu e Muay Thai. ' +
       'Gerencia matrículas, planos, pagamentos via Stripe e autenticação JWT.',
@@ -56,7 +58,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
-  console.log(`🥊 Fight Society API running on http://localhost:${port}`);
+  console.log(`🥊 ${appName} running on http://localhost:${port}`);
   console.log(`📚 Swagger docs: http://localhost:${port}/api/docs`);
 }
 

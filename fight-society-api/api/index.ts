@@ -42,8 +42,10 @@ export const createServer = async (expressInstance: Express) => {
     }),
   );
 
+  const appName = process.env.APP_NAME || 'Martial Arts Academy API';
+
   const config = new DocumentBuilder()
-    .setTitle('Fight Society API')
+    .setTitle(appName)
     .setDescription(
       'API para gerenciamento de academia de artes marciais — Jiu Jitsu e Muay Thai.',
     )

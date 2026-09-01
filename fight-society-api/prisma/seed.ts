@@ -7,13 +7,17 @@ async function main() {
   console.log('🌱 Seeding database...');
 
   // Create admin user
-  const adminPassword = await bcrypt.hash('admin123', 12);
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@martialarts.com';
+  const adminPasswordRaw = process.env.ADMIN_PASSWORD || 'admin123';
+  const appName = process.env.APP_NAME || 'Martial Arts Academy';
+
+  const adminPassword = await bcrypt.hash(adminPasswordRaw, 12);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@fightsociety.com' },
+    where: { email: adminEmail },
     update: {},
     create: {
-      name: 'Admin Fight Society',
-      email: 'admin@fightsociety.com',
+      name: `Admin ${appName}`,
+      email: adminEmail,
       passwordHash: adminPassword,
       phone: '11999990000',
       role: 'ADMIN',
@@ -76,8 +80,8 @@ async function main() {
 
   console.log('\n🎉 Seed completed!');
   console.log(`\n📋 Admin credentials:`);
-  console.log(`   Email: admin@fightsociety.com`);
-  console.log(`   Password: admin123`);
+  console.log(`   Email: ${adminEmail}`);
+  console.log(`   Password: ${adminPasswordRaw}`);
 }
 
 main()
