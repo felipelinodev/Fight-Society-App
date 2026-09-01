@@ -64,7 +64,7 @@ export default function Home() {
 
   // If a student is on an admin-only tab, redirect to home
   useEffect(() => {
-    if (user && !isAdmin && currentTab === 'students') {
+    if (user && !isAdmin && (currentTab === 'students' || currentTab === 'payments')) {
       setCurrentTab('home');
     }
   }, [user, isAdmin, currentTab]);
@@ -246,13 +246,13 @@ export default function Home() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentTab('payments')}
+                  onClick={() => setCurrentTab('profile')}
                   className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-2 group transition text-center"
                 >
                   <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition">
-                    <CreditCard size={18} />
+                    <UserIcon size={18} />
                   </div>
-                  <span className="text-xs font-bold text-slate-800">Pagamentos</span>
+                  <span className="text-xs font-bold text-slate-800">Meu Perfil</span>
                 </button>
 
                 <button
