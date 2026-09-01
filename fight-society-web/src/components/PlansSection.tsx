@@ -608,6 +608,7 @@ export function PlansSection({
         plan={checkoutPlan}
         onClose={() => setCheckoutPlan(null)}
         onPayWithCard={handleStripeCheckout}
+        onEnrollmentSuccess={onEnrollmentSuccess}
         isCardLoading={loadingPlanId === checkoutPlan?.id}
       />
     </div>
