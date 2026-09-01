@@ -2,15 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import express, { Express } from 'express';
 import { AppModule } from '../src/app.module';
 
-let cachedServer: Express | null = null;
+let cachedServer: any = null;
 
-async function bootstrap(): Promise<Express> {
-  const server = express();
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, {
     rawBody: true,
   });
 
@@ -59,7 +56,7 @@ async function bootstrap(): Promise<Express> {
   SwaggerModule.setup('api/docs', app, document);
 
   await app.init();
-  return server;
+  return app.getHttpAdapter().getInstance();
 }
 
 export default async function handler(req: any, res: any) {
