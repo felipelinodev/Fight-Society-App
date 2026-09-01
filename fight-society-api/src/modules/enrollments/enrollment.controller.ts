@@ -63,13 +63,20 @@ export class EnrollmentController {
   }
 
   @Post()
-  @Roles(Role.ADMIN)
-  @ApiOperation({ summary: 'Create enrollment - enroll student in plan (Admin only)' })
+  @ApiOperation({ summary: 'Create enrollment - enroll student in plan' })
   @ApiResponse({ status: 201, description: 'Enrollment created' })
   @ApiResponse({ status: 409, description: 'Student already enrolled in this plan' })
-  async create(@Body() createEnrollmentDto: CreateEnrollmentDto) {
+  async create(
+    @Body() createEnrollmentDto: CreateEnrollmentDto,
+    @CurrentUser() user: any,
+  ) {
+    const targetUserId =
+      user && user.role === Role.ADMIN && createEnrollmentDto.userId
+        ? createEnrollmentDto.userId
+        : user.id;
+
     return this.enrollmentService.create(
-      createEnrollmentDto.userId,
+      targetUserId,
       createEnrollmentDto.planId,
     );
   }

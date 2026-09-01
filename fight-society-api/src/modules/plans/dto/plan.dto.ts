@@ -54,6 +54,11 @@ export class UpdatePlanDto {
   @IsOptional()
   description?: string;
 
+  @ApiPropertyOptional({ enum: MartialArt, example: MartialArt.JIU_JITSU })
+  @IsEnum(MartialArt)
+  @IsOptional()
+  martialArt?: MartialArt;
+
   @ApiPropertyOptional({ example: 400.0 })
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()

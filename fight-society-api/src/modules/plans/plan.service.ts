@@ -43,6 +43,7 @@ export class PlanService {
     data: {
       name?: string;
       description?: string;
+      martialArt?: any;
       price?: number;
       durationDays?: number;
       stripePriceId?: string;
