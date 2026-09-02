@@ -105,6 +105,7 @@ export class PaymentService {
       enrollmentId,
       amount: enrollment.plan.price,
       status: PaymentStatus.PENDING,
+      stripeCheckoutSessionId: session.id,
       stripePaymentIntentId: session.payment_intent as string,
     });
 
@@ -119,6 +120,12 @@ export class PaymentService {
 
     switch (event.type) {
       case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        await this.handleCheckoutCompleted(session);
+        break;
+      }
+
+      case 'checkout.session.async_payment_succeeded': {
         const session = event.data.object as Stripe.Checkout.Session;
         await this.handleCheckoutCompleted(session);
         break;
@@ -149,33 +156,31 @@ export class PaymentService {
       return;
     }
 
-    if (session.payment_intent) {
-      const paymentIntentId = session.payment_intent as string;
-      const existingPayment =
-        await this.paymentRepository.findByStripePaymentIntentId(
-          paymentIntentId,
-        );
+    let existingPayment = await this.paymentRepository.findByStripeCheckoutSessionId(session.id);
 
-      if (existingPayment) {
-        await this.paymentRepository.update(existingPayment.id, {
-          status: PaymentStatus.PAID,
-          paidAt: new Date(),
-        });
-      }
+    if (!existingPayment && session.payment_intent) {
+      existingPayment = await this.paymentRepository.findByStripePaymentIntentId(
+        session.payment_intent as string,
+      );
+    }
+
+    // Fallback also repairs payments created before the checkout session ID was stored.
+    if (!existingPayment) {
+      existingPayment = await this.paymentRepository.findPendingByEnrollmentId(enrollmentId);
+    }
+
+    if (existingPayment) {
+      await this.paymentRepository.update(existingPayment.id, {
+        status: PaymentStatus.PAID,
+        paidAt: new Date(),
+        ...(session.payment_intent
+          ? { stripePaymentIntentId: session.payment_intent as string }
+          : {}),
+      });
     }
 
     // Activate enrollment upon confirmed payment
-    try {
-      await this.prisma.enrollment.update({
-        where: { id: enrollmentId },
-        data: {
-          status: EnrollmentStatus.ACTIVE,
-          startDate: new Date(),
-        },
-      });
-    } catch (e) {
-      this.logger.error(`Error activating enrollment ${enrollmentId}:`, e);
-    }
+    await this.activateEnrollment(enrollmentId);
 
     this.logger.log(
       `Checkout completed & enrollment activated: ${enrollmentId}`,
@@ -193,6 +198,8 @@ export class PaymentService {
         paidAt: new Date(),
       });
 
+      await this.activateEnrollment(payment.enrollmentId);
+
       this.logger.log(`Payment succeeded: ${payment.id}`);
     }
   }
@@ -208,6 +215,20 @@ export class PaymentService {
       });
 
       this.logger.log(`Payment failed: ${payment.id}`);
+    }
+  }
+
+  private async activateEnrollment(enrollmentId: string) {
+    try {
+      await this.prisma.enrollment.update({
+        where: { id: enrollmentId },
+        data: {
+          status: EnrollmentStatus.ACTIVE,
+          startDate: new Date(),
+        },
+      });
+    } catch (error) {
+      this.logger.error(`Error activating enrollment ${enrollmentId}:`, error);
     }
   }
 }

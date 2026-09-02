@@ -4,6 +4,13 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from '../src/app.module';
 
+// Stripe signatures require the untouched request body.
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 let cachedServer: any = null;
 
 async function bootstrap() {

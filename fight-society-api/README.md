@@ -84,6 +84,8 @@ NODE_ENV=production
 
 Depois do deploy, a API ficará disponível em `https://seu-projeto.vercel.app/api` e a documentação em `https://seu-projeto.vercel.app/api/docs`.
 
+No Stripe, crie um endpoint de webhook apontando para `https://seu-projeto.vercel.app/api/payments/webhook` e habilite `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `payment_intent.succeeded` e `payment_intent.payment_failed`. Copie o signing secret (`whsec_...`) para `STRIPE_WEBHOOK_SECRET` e publique novamente a API.
+
 Antes do primeiro deploy, confirme que o banco PostgreSQL aceita conexões externas e que `DATABASE_URL` inclui `sslmode=require` quando exigido pelo provedor.
 
 If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:

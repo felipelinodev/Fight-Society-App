@@ -55,6 +55,19 @@ export class PaymentRepository implements IPaymentRepository {
     });
   }
 
+  async findByStripeCheckoutSessionId(sessionId: string): Promise<Payment | null> {
+    return this.prisma.payment.findUnique({
+      where: { stripeCheckoutSessionId: sessionId },
+    });
+  }
+
+  async findPendingByEnrollmentId(enrollmentId: string): Promise<Payment | null> {
+    return this.prisma.payment.findFirst({
+      where: { enrollmentId, status: 'PENDING' },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async findByStripeInvoiceId(invoiceId: string): Promise<Payment | null> {
     return this.prisma.payment.findUnique({
       where: { stripeInvoiceId: invoiceId },
