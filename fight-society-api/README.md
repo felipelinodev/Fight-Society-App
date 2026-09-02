@@ -59,7 +59,32 @@ $ npm run test:cov
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Vercel
+
+1. Crie um projeto na Vercel apontando para este repositório.
+2. Defina `fight-society-api` como **Root Directory**.
+3. A configuração `vercel.json` usa `api/index.ts` como função serverless.
+4. Cadastre todas as variáveis abaixo no ambiente **Production**.
+5. O comando `vercel-build` gera o Prisma Client, executa `prisma migrate deploy` e compila a API.
+
+Variáveis obrigatórias:
+
+```env
+DATABASE_URL=postgresql://...
+JWT_SECRET=uma-chave-longa-e-aleatoria
+JWT_REFRESH_SECRET=outra-chave-longa-e-aleatoria
+STRIPE_PUBLIC_KEY=pk_live_...
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+CORS_ORIGIN=https://seu-frontend.vercel.app
+NODE_ENV=production
+```
+
+`CORS_ORIGIN` deve ser a URL exata do frontend publicado, sem barra no final. Em um banco novo, as migrações da pasta `prisma/migrations` serão aplicadas durante o build.
+
+Depois do deploy, a API ficará disponível em `https://seu-projeto.vercel.app/api` e a documentação em `https://seu-projeto.vercel.app/api/docs`.
+
+Antes do primeiro deploy, confirme que o banco PostgreSQL aceita conexões externas e que `DATABASE_URL` inclui `sslmode=require` quando exigido pelo provedor.
 
 If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
 

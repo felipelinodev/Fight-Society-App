@@ -18,6 +18,14 @@ interface AuthContextType {
   }) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  updateProfile: (data: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    cpf?: string;
+    currentPassword?: string;
+  }) => Promise<void>;
+  updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -111,6 +119,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateProfile = async (data: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    cpf?: string;
+    currentPassword?: string;
+  }) => {
+    if (!token) return;
+    const updatedUser = await api.updateProfile(data, token);
+    setUser(updatedUser);
+    localStorage.setItem('fight_society_user', JSON.stringify(updatedUser));
+  };
+
+  const updatePassword = async (currentPassword: string, newPassword: string) => {
+    if (!token) return;
+    await api.updatePassword(currentPassword, newPassword, token);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -121,6 +147,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         logout,
         refreshUser,
+        updateProfile,
+        updatePassword,
       }}
     >
       {children}

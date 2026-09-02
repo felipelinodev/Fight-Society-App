@@ -10,6 +10,7 @@ import { PlansSection } from '@/components/PlansSection';
 import { PaymentsHistory } from '@/components/PaymentsHistory';
 import { BottomNav, TabType } from '@/components/BottomNav';
 import { AuthModal } from '@/components/AuthModal';
+import { ProfileSection } from '@/components/ProfileSection';
 import {
   LogOut,
   User as UserIcon,
@@ -23,9 +24,8 @@ import {
   Flame,
   ArrowRight,
   TrendingUp,
-  Mail,
-  Phone,
   Shield,
+  Clock,
 } from 'lucide-react';
 
 const DEFAULT_FALLBACK_PLANS: Plan[] = [
@@ -78,11 +78,28 @@ export default function Home() {
   const [currentTab, setCurrentTab] = useState<TabType>('home');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [paymentSuccessBanner, setPaymentSuccessBanner] = useState(false);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
 
   // Data from API
   const [plans, setPlans] = useState<Plan[]>(DEFAULT_FALLBACK_PLANS);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+
+  // Helper to reload user enrollments + payments
+  const refreshUserData = async () => {
+    if (!token) return;
+    try {
+      const [enr, pay] = await Promise.all([
+        api.getMyEnrollments(token),
+        api.getMyPayments(token),
+      ]);
+      setEnrollments(enr);
+      setPayments(pay);
+    } catch {
+      // silent
+    }
+  };
 
   const refreshPlans = () => {
     api
@@ -108,8 +125,58 @@ export default function Home() {
   // Load user data if logged in
   useEffect(() => {
     if (token && user) {
-      api.getMyEnrollments(token).then(setEnrollments).catch(() => { });
-      api.getMyPayments(token).then(setPayments).catch(() => { });
+      refreshUserData();
+    }
+  }, [token, user]);
+
+  // Handle Stripe redirect: ?payment=success&session_id=...
+  useEffect(() => {
+    if (!token || !user) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const paymentResult = params.get('payment');
+
+    if (paymentResult === 'success') {
+      // Clean URL immediately so it doesn't re-trigger
+      window.history.replaceState({}, '', window.location.pathname);
+
+      setVerifyingPayment(true);
+      setCurrentTab('home');
+
+      // Poll for payment confirmation (webhook may take a few seconds)
+      const pollForConfirmation = async () => {
+        const MAX_ATTEMPTS = 8;
+        const POLL_INTERVAL = 2000;
+
+        for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+          await new Promise((r) => setTimeout(r, POLL_INTERVAL));
+
+          try {
+            const updatedPayments = await api.getMyPayments(token);
+            const paidPayment = updatedPayments.find((p) => p.status === 'PAID');
+
+            if (paidPayment) {
+              await refreshUserData();
+              setVerifyingPayment(false);
+              setPaymentSuccessBanner(true);
+              setTimeout(() => setPaymentSuccessBanner(false), 8000);
+              return;
+            }
+          } catch {
+            // ignore, keep polling
+          }
+        }
+
+        // After all attempts, refresh and show result anyway
+        await refreshUserData();
+        setVerifyingPayment(false);
+        setPaymentSuccessBanner(true);
+        setTimeout(() => setPaymentSuccessBanner(false), 8000);
+      };
+
+      pollForConfirmation();
+    } else if (paymentResult === 'cancel') {
+      window.history.replaceState({}, '', window.location.pathname);
     }
   }, [token, user]);
 
@@ -133,10 +200,42 @@ export default function Home() {
   };
 
   return (
-    <main className="relative w-full max-w-md min-h-[92vh] mx-auto bg-slate-50 rounded-[40px] shadow-2xl border-4 border-slate-900/10 overflow-hidden flex flex-col justify-between">
+    <main className="relative w-full min-h-screen bg-slate-50 overflow-hidden flex flex-col justify-between">
       {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto px-5 pt-6 pb-28 space-y-6">
-        {/* Top Header */}
+      <div className="flex-1 w-full max-w-3xl mx-auto overflow-y-auto px-4 py-5 sm:px-5 sm:pt-6 pb-32 sm:pb-32 space-y-6">
+        {/* Payment Verification Loading Screen */}
+        {verifyingPayment && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-200">
+            <div className="bg-white rounded-3xl p-8 shadow-2xl text-center max-w-sm mx-4 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto">
+                <div className="w-8 h-8 border-[3px] border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+              </div>
+              <h3 className="text-lg font-black text-slate-900">Verificando Pagamento...</h3>
+              <p className="text-xs text-slate-500 font-medium">
+                Estamos confirmando seu pagamento com o Stripe. Isso pode levar alguns segundos.
+              </p>
+              <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400">
+                <ShieldCheck size={13} className="text-emerald-600" />
+                <span>Processado com segurança pela Stripe</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Payment Success Banner */}
+        {paymentSuccessBanner && (
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg flex items-center gap-3 animate-in slide-in-from-top duration-300">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+              <CheckCircle2 size={22} />
+            </div>
+            <div>
+              <h4 className="text-sm font-black">Pagamento Confirmado! 🎉</h4>
+              <p className="text-[11px] text-white/90 font-medium">
+                Sua matrícula foi ativada com sucesso. Bons treinos!
+              </p>
+            </div>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -319,32 +418,65 @@ export default function Home() {
                   Nenhum pagamento registrado até o momento.
                 </div>
               ) : (
-                payments.slice(0, 3).map((p) => (
-                  <div
-                    key={p.id}
-                    className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                        <CheckCircle2 size={16} />
+                payments.slice(0, 3).map((p) => {
+                  const isPaid = p.status === 'PAID';
+                  const isPending = p.status === 'PENDING';
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                            isPaid
+                              ? 'bg-emerald-50 text-emerald-600'
+                              : isPending
+                              ? 'bg-amber-50 text-amber-600'
+                              : 'bg-rose-50 text-rose-600'
+                          }`}
+                        >
+                          {isPaid ? (
+                            <CheckCircle2 size={16} />
+                          ) : isPending ? (
+                            <Clock size={16} />
+                          ) : (
+                            <AlertTriangle size={16} />
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900">
+                            {p.enrollment?.plan?.name || 'Mensalidade Stripe'}
+                          </h4>
+                          <span className="text-[10px] text-slate-400">
+                            {p.paidAt
+                              ? new Date(p.paidAt).toLocaleDateString('pt-BR')
+                              : isPending
+                              ? 'Aguardando Pagamento'
+                              : 'Não Concluído'}
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">
-                          {p.enrollment?.plan?.name || 'Mensalidade Stripe'}
-                        </h4>
-                        <span className="text-[10px] text-slate-400">
-                          {p.paidAt ? new Date(p.paidAt).toLocaleDateString('pt-BR') : 'Confirmado'}
+                      <div className="text-right">
+                        <span className="text-xs font-black text-slate-900 block">
+                          R$ {Number(p.amount).toFixed(2)}
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold ${
+                            isPaid
+                              ? 'text-emerald-600'
+                              : isPending
+                              ? 'text-amber-600'
+                              : 'text-rose-600'
+                          }`}
+                        >
+                          {isPaid ? 'Pago' : isPending ? 'Pendente' : 'Recusado'}
                         </span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <span className="text-xs font-black text-slate-900 block">
-                        R$ {Number(p.amount).toFixed(2)}
-                      </span>
-                      <span className="text-[10px] font-bold text-emerald-600">Pago</span>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
@@ -365,9 +497,7 @@ export default function Home() {
               onOpenAuth={handleOpenLogin}
               onRefreshPlans={refreshPlans}
               onEnrollmentSuccess={() => {
-                if (token) {
-                  api.getMyEnrollments(token).then(setEnrollments);
-                }
+                refreshUserData();
               }}
             />
           </div>
@@ -380,57 +510,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* TAB 5: PERFIL DO ALUNO (Apenas para STUDENT) */}
-        {currentTab === 'profile' && user && !isAdmin && (
-          <div className="space-y-5 animate-in fade-in duration-300">
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 text-center shadow-xs">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-red-600 to-rose-500 text-white flex items-center justify-center text-2xl font-black mx-auto mb-3 shadow-lg">
-                {user.name.slice(0, 2).toUpperCase()}
-              </div>
-              <h3 className="text-lg font-black text-slate-900">{user.name}</h3>
-              <p className="text-xs text-slate-500">{user.email}</p>
-              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-100">
-                <Swords size={13} />
-                <span>Aluno Matriculado</span>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-3xl bg-white border border-slate-200 space-y-3">
-              <div className="flex justify-between items-center text-xs font-semibold py-2 border-b border-slate-100">
-                <span className="text-slate-500 flex items-center gap-1.5">
-                  <Phone size={13} />
-                  <span>Telefone</span>
-                </span>
-                <span className="text-slate-900 font-bold">{user.phone || 'Não informado'}</span>
-              </div>
-              <div className="flex justify-between items-center text-xs font-semibold py-2 border-b border-slate-100">
-                <span className="text-slate-500 flex items-center gap-1.5">
-                  <Mail size={13} />
-                  <span>E-mail</span>
-                </span>
-                <span className="text-slate-900 font-bold">{user.email}</span>
-              </div>
-              <div className="flex justify-between items-center text-xs font-semibold py-2">
-                <span className="text-slate-500 flex items-center gap-1.5">
-                  <ShieldCheck size={13} />
-                  <span>Status da Conta</span>
-                </span>
-                <span className="text-emerald-600 font-bold flex items-center gap-1">
-                  <CheckCircle2 size={13} />
-                  <span>Ativa</span>
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={logout}
-              className="w-full py-3.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs flex items-center justify-center gap-2 transition"
-            >
-              <LogOut size={16} />
-              <span>Sair da Conta</span>
-            </button>
-          </div>
-        )}
+         {/* TAB 5: PERFIL E CREDENCIAIS */}
+         {currentTab === 'profile' && user && <ProfileSection />}
       </div>
 
       {/* Floating Bottom Navigation Bar */}

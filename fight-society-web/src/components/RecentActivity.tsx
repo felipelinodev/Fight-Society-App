@@ -60,36 +60,58 @@ export function RecentActivity({ payments, onViewAll }: RecentActivityProps) {
 
       <div className="space-y-3">
         {/* Real Payments from Stripe if available */}
-        {payments && payments.length > 0 && payments.slice(0, 2).map((payment) => (
-          <div
-            key={payment.id}
-            className="flex items-center justify-between p-3.5 bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:border-red-200 transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <CreditCard size={20} />
+        {payments && payments.length > 0 && payments.slice(0, 2).map((payment) => {
+          const isPaid = payment.status === 'PAID';
+          const isPending = payment.status === 'PENDING';
+          return (
+            <div
+              key={payment.id}
+              className="flex items-center justify-between p-3.5 bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:border-red-200 transition"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-11 h-11 rounded-2xl flex items-center justify-center ${
+                    isPaid
+                      ? 'bg-emerald-50 text-emerald-600'
+                      : isPending
+                      ? 'bg-amber-50 text-amber-600'
+                      : 'bg-rose-50 text-rose-600'
+                  }`}
+                >
+                  <CreditCard size={20} />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900">
+                    {payment.enrollment?.plan?.name || 'Mensalidade Stripe'}
+                  </h4>
+                  <p className="text-[11px] font-medium text-slate-500">
+                    {payment.paidAt
+                      ? new Date(payment.paidAt).toLocaleDateString('pt-BR')
+                      : isPending
+                      ? 'Aguardando Pagamento'
+                      : 'Pendente'}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-xs font-bold text-slate-900">
-                  {payment.enrollment?.plan?.name || 'Mensalidade Stripe'}
-                </h4>
-                <p className="text-[11px] font-medium text-slate-500">
-                  {payment.paidAt
-                    ? new Date(payment.paidAt).toLocaleDateString('pt-BR')
-                    : 'Pagamento Concluído'}
-                </p>
+              <div className="text-right">
+                <span className="text-xs font-black text-slate-900 block">
+                  -R$ {Number(payment.amount).toFixed(2)}
+                </span>
+                <span
+                  className={`text-[10px] font-bold ${
+                    isPaid
+                      ? 'text-emerald-600'
+                      : isPending
+                      ? 'text-amber-600'
+                      : 'text-rose-600'
+                  }`}
+                >
+                  {isPaid ? 'Pago ✅' : isPending ? 'Pendente ⏳' : 'Recusado ❌'}
+                </span>
               </div>
             </div>
-            <div className="text-right">
-              <span className="text-xs font-black text-slate-900 block">
-                -R$ {Number(payment.amount).toFixed(2)}
-              </span>
-              <span className="text-[10px] font-bold text-emerald-600">
-                {payment.status === 'PAID' ? 'Pago ✅' : payment.status}
-              </span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Regular Activity feed */}
         {dummyActivities.map((item) => {

@@ -46,6 +46,16 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto {
+  @ApiPropertyOptional({ example: 'novo@email.com' })
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @ApiPropertyOptional({ example: 'CurrentPassword@123', description: 'Required when changing the email' })
+  @IsString()
+  @IsOptional()
+  currentPassword?: string;
+
   @ApiPropertyOptional({ example: 'João Silva Updated' })
   @IsString()
   @IsOptional()

@@ -1,4 +1,4 @@
-import { ApiResponse, AuthResponse, Enrollment, Payment, Plan, User } from '@/types/api';
+import { AuthResponse, Enrollment, Payment, Plan, User } from '@/types/api';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://fight-society-api.vercel.app/api';
 
@@ -36,8 +36,8 @@ class ApiClient {
         typeof data?.message === 'string'
           ? data.message
           : Array.isArray(data?.message)
-          ? data.message.join(', ')
-          : 'Erro ao processar requisição';
+            ? data.message.join(', ')
+            : 'Erro ao processar requisição';
       throw new Error(errorMsg);
     }
 
@@ -72,6 +72,23 @@ class ApiClient {
 
   async getAllUsers(token: string): Promise<User[]> {
     return this.request<User[]>('/users', { method: 'GET' }, token);
+  }
+
+  async updateProfile(
+    data: { name?: string; email?: string; phone?: string; cpf?: string; currentPassword?: string },
+    token: string,
+  ): Promise<User> {
+    return this.request<User>('/users/me', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }, token);
+  }
+
+  async updatePassword(currentPassword: string, newPassword: string, token: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/users/me/password', {
+      method: 'PATCH',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }, token);
   }
 
   // ================= Plans =================

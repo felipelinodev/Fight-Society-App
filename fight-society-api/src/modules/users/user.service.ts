@@ -3,6 +3,7 @@ import {
   Inject,
   NotFoundException,
   ConflictException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -33,11 +34,22 @@ export class UserService {
 
   async updateProfile(
     id: string,
-    data: { name?: string; phone?: string; cpf?: string },
+    data: { name?: string; email?: string; phone?: string; cpf?: string; currentPassword?: string },
   ) {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    if (data.email && data.email !== user.email) {
+      if (!data.currentPassword || !(await bcrypt.compare(data.currentPassword, user.passwordHash))) {
+        throw new UnauthorizedException('Current password is incorrect');
+      }
+
+      const existingEmail = await this.userRepository.findByEmail(data.email);
+      if (existingEmail && existingEmail.id !== id) {
+        throw new ConflictException('Email already registered');
+      }
     }
 
     if (data.cpf && data.cpf !== user.cpf) {
@@ -50,7 +62,8 @@ export class UserService {
       }
     }
 
-    const updated = await this.userRepository.update(id, data);
+    const { currentPassword: _currentPassword, ...profileData } = data;
+    const updated = await this.userRepository.update(id, profileData);
     return this.sanitizeUser(updated);
   }
 
