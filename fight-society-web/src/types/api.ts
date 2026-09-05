@@ -89,3 +89,9 @@ export interface ApiResponse<T> {
   statusCode?: number;
 }
 
+export interface DojoDescription {
+  id: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}

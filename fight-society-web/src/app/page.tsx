@@ -12,6 +12,7 @@ import { BottomNav, TabType } from '@/components/BottomNav';
 import { AuthModal } from '@/components/AuthModal';
 import { ProfileSection } from '@/components/ProfileSection';
 import { StudentCheckInsSection } from '@/components/StudentCheckInsSection';
+import { DojoDescriptionSection } from '@/components/DojoDescriptionSection';
 import {
   LogOut,
   User as UserIcon,
@@ -343,6 +344,8 @@ export default function Home() {
                 </div>
               </div>
             )}
+
+            <DojoDescriptionSection />
 
             {/* Quick Action Navigation Buttons (Distinct for Student vs Admin) */}
             {isAdmin ? (

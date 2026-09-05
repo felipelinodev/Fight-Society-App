@@ -1,4 +1,4 @@
-import { AuthResponse, CheckIn, Enrollment, Payment, Plan, PlanSchedule, User } from '@/types/api';
+import { AuthResponse, CheckIn, DojoDescription, Enrollment, Payment, Plan, PlanSchedule, User } from '@/types/api';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
@@ -94,6 +94,29 @@ class ApiClient {
   // ================= Plans =================
   async getPlans(token?: string | null): Promise<Plan[]> {
     return this.request<Plan[]>('/plans', { method: 'GET' }, token);
+  }
+
+  // ================= Dojo =================
+  async getDojoDescription(): Promise<DojoDescription | null> {
+    return this.request<DojoDescription | null>('/dojo', { method: 'GET' });
+  }
+
+  async createDojoDescription(description: string, token: string): Promise<DojoDescription> {
+    return this.request<DojoDescription>('/dojo', {
+      method: 'POST',
+      body: JSON.stringify({ description }),
+    }, token);
+  }
+
+  async updateDojoDescription(id: string, description: string, token: string): Promise<DojoDescription> {
+    return this.request<DojoDescription>(`/dojo/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ description }),
+    }, token);
+  }
+
+  async deleteDojoDescription(id: string, token: string): Promise<DojoDescription> {
+    return this.request<DojoDescription>(`/dojo/${id}`, { method: 'DELETE' }, token);
   }
 
   async createPlan(planData: Partial<Plan>, token: string): Promise<Plan> {
@@ -241,4 +264,3 @@ class ApiClient {
 }
 
 export const api = new ApiClient(API_BASE);
-
