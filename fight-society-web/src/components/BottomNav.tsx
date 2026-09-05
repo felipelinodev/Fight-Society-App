@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { CreditCard, LayoutDashboard, LucideIcon, Swords, User as UserIcon, Users } from 'lucide-react';
+import { CalendarCheck, CreditCard, LayoutDashboard, LucideIcon, Swords, User as UserIcon, Users } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
-export type TabType = 'home' | 'students' | 'plans' | 'payments' | 'profile';
+export type TabType = 'home' | 'students' | 'plans' | 'payments' | 'checkins' | 'profile';
 
 interface BottomNavProps {
   currentTab: TabType;
@@ -19,6 +19,7 @@ interface NavItem {
 
 const studentItems: NavItem[] = [
   { tab: 'home', title: 'Minha matrícula', icon: LayoutDashboard },
+  { tab: 'checkins', title: 'Check-in', icon: CalendarCheck },
   { tab: 'plans', title: 'Planos de treino', icon: Swords },
   { tab: 'profile', title: 'Meu perfil', icon: UserIcon },
 ];

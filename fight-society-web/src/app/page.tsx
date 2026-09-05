@@ -11,6 +11,7 @@ import { PaymentsHistory } from '@/components/PaymentsHistory';
 import { BottomNav, TabType } from '@/components/BottomNav';
 import { AuthModal } from '@/components/AuthModal';
 import { ProfileSection } from '@/components/ProfileSection';
+import { StudentCheckInsSection } from '@/components/StudentCheckInsSection';
 import {
   LogOut,
   User as UserIcon,
@@ -26,6 +27,7 @@ import {
   TrendingUp,
   Shield,
   Clock,
+  CalendarCheck,
 } from 'lucide-react';
 
 const DEFAULT_FALLBACK_PLANS: Plan[] = [
@@ -376,25 +378,35 @@ export default function Home() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setCurrentTab('plans')}
-                  className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-2 group transition text-center"
+                  className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-1.5 group transition text-center"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition">
-                    <Swords size={18} />
+                  <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition">
+                    <Swords size={17} />
                   </div>
-                  <span className="text-xs font-bold text-slate-800">Ver Planos</span>
+                  <span className="text-[11px] font-bold text-slate-800">Planos</span>
+                </button>
+
+                <button
+                  onClick={() => setCurrentTab('checkins')}
+                  className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-1.5 group transition text-center"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition">
+                    <CalendarCheck size={17} />
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-800">Check-in</span>
                 </button>
 
                 <button
                   onClick={() => setCurrentTab('profile')}
-                  className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-2 group transition text-center"
+                  className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-1.5 group transition text-center"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition">
-                    <UserIcon size={18} />
+                  <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition">
+                    <UserIcon size={17} />
                   </div>
-                  <span className="text-xs font-bold text-slate-800">Meu Perfil</span>
+                  <span className="text-[11px] font-bold text-slate-800">Meu Perfil</span>
                 </button>
               </div>
             )}
@@ -510,8 +522,15 @@ export default function Home() {
           </div>
         )}
 
-         {/* TAB 5: PERFIL E CREDENCIAIS */}
-         {currentTab === 'profile' && user && <ProfileSection />}
+        {/* TAB CHECK-INS (Apenas para Alunos) */}
+        {currentTab === 'checkins' && user && !isAdmin && (
+          <div className="animate-in fade-in duration-300">
+            <StudentCheckInsSection />
+          </div>
+        )}
+
+        {/* TAB 5: PERFIL E CREDENCIAIS */}
+        {currentTab === 'profile' && user && <ProfileSection />}
       </div>
 
       {/* Floating Bottom Navigation Bar */}
