@@ -8,6 +8,8 @@ import { UsersModule } from './modules/users/users.module';
 import { PlansModule } from './modules/plans/plans.module';
 import { EnrollmentsModule } from './modules/enrollments/enrollments.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { SchedulesModule } from './modules/schedules/schedules.module';
+import { CheckInsModule } from './modules/checkins/checkins.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -30,6 +32,8 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
     PlansModule,
     EnrollmentsModule,
     PaymentsModule,
+    SchedulesModule,
+    CheckInsModule,
   ],
   providers: [
     // Global JWT auth guard (all routes protected by default)

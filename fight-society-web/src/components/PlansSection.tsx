@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { Shield, Zap, Check, ArrowRight, Sparkles, Plus, Edit2, Flame, Swords, Trash2 } from 'lucide-react';
 import { PixCheckoutModal } from '@/components/PixCheckoutModal';
+import { PlanScheduleManager } from '@/components/PlanScheduleManager';
 
 interface PlansSectionProps {
   plans: Plan[];
@@ -361,6 +362,15 @@ export function PlansSection({
                   {plan.description}
                 </p>
               )}
+
+              {/* Training Schedules */}
+              <div className="mb-4">
+                <PlanScheduleManager
+                  plan={plan}
+                  onUpdate={() => onRefreshPlans?.()}
+                  isDark={isPopular}
+                />
+              </div>
 
               {/* Features List */}
               <div className="space-y-2 mb-5">

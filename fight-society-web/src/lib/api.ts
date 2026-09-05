@@ -1,4 +1,4 @@
-import { AuthResponse, Enrollment, Payment, Plan, User } from '@/types/api';
+import { AuthResponse, CheckIn, Enrollment, Payment, Plan, PlanSchedule, User } from '@/types/api';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
@@ -181,6 +181,64 @@ class ApiClient {
   async getAllPayments(token: string): Promise<Payment[]> {
     return this.request<Payment[]>('/payments', { method: 'GET' }, token);
   }
+
+  // ================= Schedules =================
+  async getPlanSchedules(planId: string, token?: string | null): Promise<PlanSchedule[]> {
+    return this.request<PlanSchedule[]>(`/plans/${planId}/schedules`, { method: 'GET' }, token);
+  }
+
+  async createPlanSchedule(
+    planId: string,
+    data: { dayOfWeek: number; startTime: string; endTime: string; instructor?: string },
+    token: string,
+  ): Promise<PlanSchedule> {
+    return this.request<PlanSchedule>(
+      `/plans/${planId}/schedules`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+      token,
+    );
+  }
+
+  async deletePlanSchedule(id: string, token: string): Promise<PlanSchedule> {
+    return this.request<PlanSchedule>(
+      `/schedules/${id}`,
+      { method: 'DELETE' },
+      token,
+    );
+  }
+
+  // ================= Check-ins =================
+  async createCheckIn(
+    userId: string,
+    enrollmentId: string,
+    token: string,
+    note?: string,
+  ): Promise<CheckIn> {
+    return this.request<CheckIn>(
+      '/checkins',
+      {
+        method: 'POST',
+        body: JSON.stringify({ userId, enrollmentId, note }),
+      },
+      token,
+    );
+  }
+
+  async getCheckIns(token: string, filters?: { userId?: string; date?: string }): Promise<CheckIn[]> {
+    const params = new URLSearchParams();
+    if (filters?.userId) params.set('userId', filters.userId);
+    if (filters?.date) params.set('date', filters.date);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return this.request<CheckIn[]>(`/checkins${qs}`, { method: 'GET' }, token);
+  }
+
+  async getMyCheckIns(token: string): Promise<CheckIn[]> {
+    return this.request<CheckIn[]>('/checkins/my', { method: 'GET' }, token);
+  }
 }
 
 export const api = new ApiClient(API_BASE);
+

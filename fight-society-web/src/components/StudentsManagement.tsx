@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Enrollment, Plan, Payment } from '@/types/api';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { StudentDetailModal } from './StudentDetailModal';
 import {
   Users,
   CheckCircle2,
@@ -151,7 +152,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
   });
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-5 pb-32">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -165,7 +166,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
 
         <button
           onClick={() => setShowEnrollModal(true)}
-          className="py-2.5 px-4 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95"
+          className="py-2.5 px-4 rounded-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs shadow-lg shadow-red-500/25 flex items-center gap-2 transition-all transform active:scale-95 shrink-0"
         >
           <UserPlus size={15} />
           <span>Matricular Aluno</span>
@@ -175,62 +176,110 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
       {/* KPI Cards: Quem pagou vs Quem deixou de pagar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Total Alunos */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
           <div className="flex items-center justify-between text-slate-500 mb-1">
-            <span className="text-xs font-semibold">Total de Alunos</span>
-            <Users size={16} className="text-slate-700" />
+            <span className="text-xs font-bold text-slate-600">Total de Alunos</span>
+            <div className="p-1.5 rounded-xl bg-slate-100 text-slate-700">
+              <Users size={15} />
+            </div>
           </div>
-          <div className="text-2xl font-black text-slate-900">{totalStudents}</div>
+          <div className="text-2xl font-black text-slate-900 tracking-tight">{totalStudents}</div>
         </div>
 
         {/* Matrículas Ativas */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
           <div className="flex items-center justify-between text-slate-500 mb-1">
-            <span className="text-xs font-semibold">Matrículas Ativas</span>
-            <CheckCircle2 size={16} className="text-blue-600" />
+            <span className="text-xs font-bold text-slate-600">Matrículas Ativas</span>
+            <div className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
+              <CheckCircle2 size={15} />
+            </div>
           </div>
-          <div className="text-2xl font-black text-blue-600">{activeEnrollmentsCount}</div>
+          <div className="text-2xl font-black text-blue-600 tracking-tight">{activeEnrollmentsCount}</div>
         </div>
 
         {/* Pagos em Dia */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
           <div className="flex items-center justify-between text-slate-500 mb-1">
-            <span className="text-xs font-semibold">Pagos em Dia</span>
-            <CreditCard size={16} className="text-emerald-600" />
+            <span className="text-xs font-bold text-slate-600">Pagos em Dia</span>
+            <div className="p-1.5 rounded-xl bg-emerald-50 text-emerald-600">
+              <CreditCard size={15} />
+            </div>
           </div>
-          <div className="text-2xl font-black text-emerald-600">{paidStudentsCount}</div>
+          <div className="text-2xl font-black text-emerald-600 tracking-tight">{paidStudentsCount}</div>
         </div>
 
         {/* Inadimplentes / Pendentes */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
           <div className="flex items-center justify-between text-slate-500 mb-1">
-            <span className="text-xs font-semibold">Pendentes</span>
-            <AlertTriangle size={16} className="text-rose-600" />
+            <span className="text-xs font-bold text-slate-600">Pendentes</span>
+            <div className="p-1.5 rounded-xl bg-rose-50 text-rose-600">
+              <AlertTriangle size={15} />
+            </div>
           </div>
-          <div className="text-2xl font-black text-rose-600">{pendingStudentsCount}</div>
+          <div className="text-2xl font-black text-rose-600 tracking-tight">{pendingStudentsCount}</div>
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex p-1.5 bg-slate-200/80 rounded-2xl gap-1 overflow-x-auto">
+      {/* Modern Segmented Filter Tabs (Grid 4 col - Sem Rolar) */}
+      <div className="p-1 bg-slate-100/90 border border-slate-200/80 rounded-2xl shadow-inner grid grid-cols-4 gap-1">
         {[
-          { id: 'ALL', label: `Todos (${totalStudents})` },
-          { id: 'ACTIVE', label: `Ativos (${activeEnrollmentsCount})` },
-          { id: 'PENDING', label: `Pendentes (${pendingStudentsCount})` },
-          { id: 'INACTIVE', label: `Inativos (${totalStudents - activeEnrollmentsCount})` },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setStatusFilter(tab.id as any)}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
-              statusFilter === tab.id
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+          {
+            id: 'ALL',
+            label: 'Todos',
+            count: totalStudents,
+            icon: Users,
+            color: 'text-slate-500',
+          },
+          {
+            id: 'ACTIVE',
+            label: 'Ativos',
+            count: activeEnrollmentsCount,
+            icon: CheckCircle2,
+            color: 'text-emerald-500',
+          },
+          {
+            id: 'PENDING',
+            label: 'Pendentes',
+            count: pendingStudentsCount,
+            icon: AlertTriangle,
+            color: 'text-amber-500',
+          },
+          {
+            id: 'INACTIVE',
+            label: 'Inativos',
+            count: totalStudents - activeEnrollmentsCount,
+            icon: XCircle,
+            color: 'text-slate-400',
+          },
+        ].map((tab) => {
+          const isActive = statusFilter === tab.id;
+          const Icon = tab.icon;
+
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setStatusFilter(tab.id as any)}
+              className={`w-full py-2 px-1 sm:px-2 rounded-xl text-[11px] sm:text-xs font-extrabold transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 active:scale-95 ${
+                isActive
+                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-500/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/70'
+              }`}
+            >
+              <Icon size={13} className={`shrink-0 ${isActive ? 'text-white' : tab.color}`} />
+              <span className="truncate">{tab.label}</span>
+              <span
+                className={`py-0.5 px-1.5 sm:px-2 rounded-full text-[9px] sm:text-[10px] font-black shrink-0 transition-colors ${
+                  isActive
+                    ? 'bg-white/20 text-white'
+                    : 'bg-slate-200/80 text-slate-700'
+                }`}
+              >
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Search Input */}
@@ -241,8 +290,16 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
           placeholder="Buscar por nome, email ou plano..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-xs"
+          className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-xs placeholder:text-slate-400"
         />
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            className="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-100"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Student List */}
@@ -262,7 +319,8 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
             return (
               <div
                 key={student.id}
-                className="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 transition space-y-3"
+                onClick={() => setSelectedStudent(student)}
+                className="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 hover:shadow-md transition-all duration-200 space-y-3 cursor-pointer"
               >
                 {/* Top Row: Name, Badges */}
                 <div className="flex items-start justify-between gap-2">
@@ -285,26 +343,26 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
                   <div className="flex flex-col items-end gap-1 shrink-0">
                     {/* Enrollment Status Badge */}
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
                         hasActiveEnrollment
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
                           : 'bg-slate-100 text-slate-600 border border-slate-200'
                       }`}
                     >
-                      {hasActiveEnrollment ? <CheckCircle2 size={11} /> : <XCircle size={11} />}
+                      {hasActiveEnrollment ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
                       {hasActiveEnrollment ? 'Matrícula Ativa' : 'Sem Matrícula'}
                     </span>
 
                     {/* Payment Status Badge */}
                     {hasActiveEnrollment && (
                       <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
                           paymentStatus === 'PAID'
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : 'bg-rose-50 text-rose-700 border border-rose-200'
+                            ? 'bg-blue-50 text-blue-700 border border-blue-200/80'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200/80'
                         }`}
                       >
-                        <CreditCard size={10} />
+                        <CreditCard size={11} />
                         {paymentStatus === 'PAID' ? 'Pago em Dia' : 'Pagamento Pendente'}
                       </span>
                     )}
@@ -312,7 +370,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
                 </div>
 
                 {/* Plan Info & Actions */}
-                <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs">
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
                   <div className="flex items-center gap-2 text-slate-700">
                     <Swords size={14} className="text-red-600 shrink-0" />
                     <span className="font-bold">
@@ -329,22 +387,26 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
                   <div className="flex items-center gap-2">
                     {enrollment ? (
                       <button
-                        onClick={() => handleToggleStatus(enrollment)}
-                        className={`py-1.5 px-3 rounded-xl font-bold text-xs transition ${
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleStatus(enrollment);
+                        }}
+                        className={`py-1.5 px-3 rounded-full font-extrabold text-xs transition-all active:scale-95 ${
                           hasActiveEnrollment
-                            ? 'bg-rose-50 text-rose-600 hover:bg-rose-100'
-                            : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                            ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200/60'
+                            : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200/60'
                         }`}
                       >
                         {hasActiveEnrollment ? 'Desativar' : 'Reativar'}
                       </button>
                     ) : (
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedUserId(student.id);
                           setShowEnrollModal(true);
                         }}
-                        className="py-1.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs transition"
+                        className="py-1.5 px-3 rounded-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200/60 font-extrabold text-xs transition-all active:scale-95"
                       >
                         Matricular
                       </button>
@@ -430,6 +492,18 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Modal: Detalhes do Aluno */}
+      {selectedStudent && (
+        <StudentDetailModal
+          student={selectedStudent}
+          enrollment={
+            studentsWithDetails.find((s) => s.student.id === selectedStudent.id)?.enrollment || null
+          }
+          onClose={() => setSelectedStudent(null)}
+          onRefresh={loadData}
+        />
       )}
     </div>
   );

@@ -10,6 +10,7 @@ export class PlanRepository implements IPlanRepository {
   async findAll(activeOnly = false): Promise<Plan[]> {
     return this.prisma.plan.findMany({
       where: activeOnly ? { active: true } : undefined,
+      include: { schedules: { orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }] } },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -17,6 +18,7 @@ export class PlanRepository implements IPlanRepository {
   async findById(id: string): Promise<Plan | null> {
     return this.prisma.plan.findUnique({
       where: { id },
+      include: { schedules: { orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }] } },
     });
   }
 

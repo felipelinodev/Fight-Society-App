@@ -11,6 +11,15 @@ export interface User {
 
 export type MartialArt = 'JIU_JITSU' | 'MUAY_THAI';
 
+export interface PlanSchedule {
+  id: string;
+  planId: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  instructor?: string;
+}
+
 export interface Plan {
   id: string;
   name: string;
@@ -21,6 +30,7 @@ export interface Plan {
   stripePriceId?: string;
   active: boolean;
   createdAt: string;
+  schedules?: PlanSchedule[];
 }
 
 export interface Enrollment {
@@ -49,6 +59,18 @@ export interface Payment {
   };
 }
 
+export interface CheckIn {
+  id: string;
+  userId: string;
+  enrollmentId: string;
+  checkedInAt: string;
+  note?: string;
+  user?: Partial<User>;
+  enrollment?: {
+    plan?: { id: string; name: string; martialArt: MartialArt };
+  };
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -66,3 +88,4 @@ export interface ApiResponse<T> {
   message?: string;
   statusCode?: number;
 }
+

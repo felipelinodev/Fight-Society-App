@@ -63,6 +63,7 @@ model User {
 
   enrollments Enrollment[]
   payments    Payment[]
+  checkIns    CheckIn[]
 
   @@map("users")
 }
@@ -80,6 +81,7 @@ model Plan {
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
   enrollments Enrollment[]
+  schedules   PlanSchedule[]
 
   @@map("plans")
 }
@@ -98,6 +100,7 @@ model Enrollment {
   user     User      @relation(fields: [userId], references: [id])
   plan     Plan      @relation(fields: [planId], references: [id])
   payments Payment[]
+  checkIns CheckIn[]
 
   @@map("enrollments")
 }
@@ -120,3 +123,31 @@ model Payment {
 
   @@map("payments")
 }
+
+model PlanSchedule {
+  id         String   @id @default(uuid())
+  planId     String   @map("plan_id")
+  dayOfWeek  Int      @map("day_of_week")
+  startTime  String   @map("start_time")
+  endTime    String   @map("end_time")
+  instructor String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@map("plan_schedules")
+}
+
+model CheckIn {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  enrollmentId String   @map("enrollment_id")
+  checkedInAt  DateTime @default(now()) @map("checked_in_at")
+  note         String?
+
+  user       User       @relation(fields: [userId], references: [id])
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id])
+
+  @@map("check_ins")
+}
+
