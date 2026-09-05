@@ -1,24 +1,11 @@
 'use client';
 
-import React, { FormEvent, useState, useEffect } from 'react';
-import {
-  KeyRound,
-  Loader2,
-  LogOut,
-  Save,
-  ShieldCheck,
-  User as UserIcon,
-  UserCheck,
-  CheckCircle2,
-  Activity,
-  Calendar,
-} from 'lucide-react';
+import React, { FormEvent, useState } from 'react';
+import { KeyRound, Loader2, LogOut, Save, ShieldCheck, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { api } from '@/lib/api';
-import { CheckIn } from '@/types/api';
 
 export function ProfileSection() {
-  const { user, token, logout, updateProfile, updatePassword } = useAuth();
+  const { user, logout, updateProfile, updatePassword } = useAuth();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState(user?.phone || '');
@@ -30,19 +17,6 @@ export function ProfileSection() {
   const [error, setError] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
-
-  // Check-ins (Read-only for students)
-  const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
-  const [loadingCheckIns, setLoadingCheckIns] = useState(false);
-
-  useEffect(() => {
-    if (!token) return;
-    setLoadingCheckIns(true);
-    api.getMyCheckIns(token)
-      .then((data) => setCheckIns(data || []))
-      .catch(() => setCheckIns([]))
-      .finally(() => setLoadingCheckIns(false));
-  }, [token]);
 
   const clearFeedback = () => {
     setMessage('');
@@ -137,71 +111,6 @@ export function ProfileSection() {
           </button>
         </div>
       </form>
-
-      {/* Seção de Check-ins / Presenças (Somente leitura para o aluno) */}
-      <div className="space-y-4 rounded-3xl bg-white border border-slate-200 p-5 shadow-xs">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
-              <UserCheck size={20} />
-            </div>
-            <div>
-              <h3 className="text-sm font-black text-slate-900">Minhas Presenças</h3>
-              <p className="text-[11px] text-slate-500">Histórico de treinos validados na academia.</p>
-            </div>
-          </div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-            <Activity size={13} />
-            {checkIns.length} {checkIns.length === 1 ? 'Presença' : 'Presenças'}
-          </span>
-        </div>
-
-        {loadingCheckIns ? (
-          <div className="py-6 text-center text-xs font-bold text-slate-400">
-            Carregando presenças...
-          </div>
-        ) : checkIns.length === 0 ? (
-          <div className="py-8 text-center bg-slate-50 rounded-2xl border border-slate-200/60 p-4 space-y-1.5">
-            <UserCheck size={28} className="mx-auto text-slate-400" />
-            <p className="text-xs font-bold text-slate-700">Nenhum check-in registrado ainda</p>
-            <p className="text-[10px] text-slate-400 max-w-xs mx-auto">
-              Suas presenças serão validadas e registradas pelos instrutores ao chegar na academia.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-            {checkIns.map((ci) => (
-              <div
-                key={ci.id}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={16} />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">
-                      {ci.enrollment?.plan?.name || 'Treino Confirmado'}
-                    </h4>
-                    <span className="text-[10px] text-slate-500 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      {ci.note || 'Presença confirmada'}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-black text-slate-900 block">
-                    {new Date(ci.checkedInAt).toLocaleDateString('pt-BR')}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-semibold">
-                    {new Date(ci.checkedInAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
 
       <form onSubmit={handlePasswordSubmit} className="space-y-4 rounded-3xl bg-white border border-slate-200 p-5 shadow-xs">
         <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
