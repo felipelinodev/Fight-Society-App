@@ -1,6 +1,6 @@
 import { AuthResponse, Enrollment, Payment, Plan, User } from '@/types/api';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://fight-society-api.vercel.app/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 class ApiClient {
   private baseUrl: string;

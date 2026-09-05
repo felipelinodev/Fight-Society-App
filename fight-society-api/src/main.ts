@@ -16,8 +16,17 @@ async function bootstrap() {
   app.use(helmet());
 
   // CORS
+  const corsOriginEnv = process.env.CORS_ORIGIN;
+  const allowedOrigins = corsOriginEnv
+    ? corsOriginEnv.includes(',')
+      ? corsOriginEnv.split(',').map((o) => o.trim())
+      : corsOriginEnv === '*'
+      ? true
+      : corsOriginEnv
+    : true;
+
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   });

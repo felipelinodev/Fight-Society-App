@@ -1,0 +1,13 @@
+{
+  "name": "fight-society-app",
+  "private": true,
+  "scripts": {
+    "dev:api": "cd fight-society-api && npm run dev",
+    "dev:web": "cd fight-society-web && npm run dev",
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "install:all": "cd fight-society-api && npm install && cd ../fight-society-web && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}

@@ -5,6 +5,7 @@ import { Plan, MartialArt } from '@/types/api';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { Shield, Zap, Check, ArrowRight, Sparkles, Plus, Edit2, Flame, Swords, Trash2 } from 'lucide-react';
+import { PixCheckoutModal } from '@/components/PixCheckoutModal';
 
 interface PlansSectionProps {
   plans: Plan[];
@@ -25,6 +26,10 @@ export function PlansSection({
   const [selectedArt, setSelectedArt] = useState<'ALL' | MartialArt>('ALL');
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Pix/Card checkout modal
+  const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
+  const [isCardLoading, setIsCardLoading] = useState(false);
 
   // Edit / Create Plan Modal State
   const [showPlanModal, setShowPlanModal] = useState(false);
@@ -82,38 +87,35 @@ export function PlansSection({
     return art === selectedArt;
   });
 
-  const handleEnrollClick = async (plan: Plan) => {
+  const handleEnrollClick = (plan: Plan) => {
     if (!user || !token) {
       onOpenAuth();
       return;
     }
-
     setErrorMsg(null);
-    setLoadingPlanId(plan.id);
+    setCheckoutPlan(plan);
+  };
 
+  const handlePayWithCard = async () => {
+    if (!user || !token || !checkoutPlan) return;
+    setIsCardLoading(true);
     try {
-      // 1. Get or create enrollment
       let userEnrollments = await api.getMyEnrollments(token);
-      let enrollment = userEnrollments.find(
-        (e) => e.planId === plan.id,
-      );
-
+      let enrollment = userEnrollments.find((e) => e.planId === checkoutPlan.id);
       if (!enrollment) {
-        enrollment = await api.createEnrollment(user.id, plan.id, token);
+        enrollment = await api.createEnrollment(user.id, checkoutPlan.id, token);
       }
-
-      // 2. Create Stripe checkout session
       const { checkoutUrl } = await api.createCheckout(enrollment.id, token);
-
       if (checkoutUrl) {
         window.location.href = checkoutUrl;
       } else {
         throw new Error('Não foi possível gerar a URL de pagamento do Stripe.');
       }
     } catch (err: any) {
-      setErrorMsg(err?.message || 'Erro ao processar matrícula.');
+      setErrorMsg(err?.message || 'Erro ao processar pagamento.');
+      setCheckoutPlan(null);
     } finally {
-      setLoadingPlanId(null);
+      setIsCardLoading(false);
     }
   };
 
@@ -592,6 +594,19 @@ export function PlansSection({
           </div>
         </div>
       )}
+
+      {/* Pix / Card Checkout Modal */}
+      <PixCheckoutModal
+        isOpen={checkoutPlan !== null}
+        plan={checkoutPlan}
+        onClose={() => setCheckoutPlan(null)}
+        onPayWithCard={handlePayWithCard}
+        isCardLoading={isCardLoading}
+        onEnrollmentSuccess={() => {
+          setCheckoutPlan(null);
+          if (onEnrollmentSuccess) onEnrollmentSuccess();
+        }}
+      />
     </div>
   );
 }

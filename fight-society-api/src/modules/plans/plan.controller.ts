@@ -18,6 +18,7 @@ import { Role } from '@prisma/client';
 import { PlanService } from './plan.service';
 import { CreatePlanDto, UpdatePlanDto } from './dto/plan.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiTags('Plans')
 @ApiBearerAuth()
@@ -25,6 +26,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 export class PlanController {
   constructor(private readonly planService: PlanService) {}
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'List all active plans' })
   @ApiResponse({ status: 200, description: 'Plans list retrieved' })
@@ -40,6 +42,7 @@ export class PlanController {
     return this.planService.findAll(false);
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get plan by ID' })
   @ApiResponse({ status: 200, description: 'Plan retrieved' })
