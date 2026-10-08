@@ -73,11 +73,11 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-lg max-h-[90vh] bg-[#121215] rounded-t-xl sm:rounded-xl border border-zinc-800 shadow-2xl overflow-hidden flex flex-col text-zinc-100"
+        className="relative w-full max-w-lg max-h-[90vh] surface rounded-t-xl sm:rounded-xl border border-zinc-800 shadow-2xl overflow-hidden flex flex-col text-zinc-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="relative p-5 pb-4 bg-[#121215] border-b border-zinc-800 shrink-0">
+        <div className="relative p-5 pb-4 surface border-b border-zinc-800 shrink-0">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition"
@@ -119,7 +119,7 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
 
         {/* Detail Tabs - Segmented Control do App */}
         <div className="p-2 border-b border-zinc-800 shrink-0 bg-[#0d0d10]">
-          <div className="flex p-1 bg-[#121215] border border-zinc-800 rounded-lg gap-1">
+          <div className="flex p-1 surface border border-zinc-800 rounded-lg gap-1">
             {[
               { id: 'info' as const, label: 'Informações' },
               { id: 'payments' as const, label: `Pagamentos (${payments.length})` },
@@ -218,7 +218,7 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
                     <button
                       onClick={handleCheckIn}
                       disabled={checkingIn}
-                      className="w-full py-2.5 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 transition bg-red-600 hover:bg-red-500 text-white disabled:opacity-50 shadow-sm"
+                      className="w-full py-2.5 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 transition btn-gradient text-white disabled:opacity-50 shadow-sm"
                     >
                       {checkingIn ? (
                         <>

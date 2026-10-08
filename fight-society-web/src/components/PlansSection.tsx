@@ -207,7 +207,7 @@ export function PlansSection({
       {/* Section Header */}
       <div className="flex items-center justify-between pb-1">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-gradient tracking-tight">
             Planos de Treino
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1">
@@ -218,7 +218,7 @@ export function PlansSection({
         {isAdmin && (
           <button
             onClick={openCreatePlanModal}
-            className="py-2 px-3.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold text-xs flex items-center gap-1.5 transition shadow-sm"
+            className="py-2 px-3.5 rounded-lg btn-gradient text-white font-semibold text-xs flex items-center gap-1.5 transition shadow-sm"
           >
             <Plus size={14} />
             <span>Criar Plano</span>
@@ -233,7 +233,7 @@ export function PlansSection({
       )}
 
       {/* Martial Art Filter Tabs - Flat Pro */}
-      <div className="flex p-1 bg-[#121215] border border-zinc-800 rounded-lg gap-1">
+      <div className="flex p-1 surface border border-zinc-800 rounded-lg gap-1">
         <button
           onClick={() => setSelectedArt('ALL')}
           className={`flex-1 py-1.5 rounded-md text-xs font-medium transition ${
@@ -271,7 +271,7 @@ export function PlansSection({
       {/* Plan Cards Grid */}
       <div className="grid grid-cols-1 gap-4">
         {filteredPlans.length === 0 ? (
-          <div className="p-8 bg-[#121215] rounded-xl border border-zinc-800 text-center space-y-3">
+          <div className="p-8 surface rounded-xl border border-zinc-800 text-center space-y-3">
             <div className="w-10 h-10 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto border border-zinc-700">
               <Swords size={18} />
             </div>
@@ -298,7 +298,7 @@ export function PlansSection({
             return (
               <div
                 key={plan.id}
-                className={`relative p-5 sm:p-6 rounded-xl transition border bg-[#121215] ${
+                className={`relative p-5 sm:p-6 rounded-xl transition border surface ${
                   isPopular
                     ? 'border-zinc-700 shadow-sm'
                     : 'border-zinc-800 hover:border-zinc-700'
@@ -375,7 +375,7 @@ export function PlansSection({
                   <button
                     onClick={() => handleEnrollClick(plan)}
                     disabled={loadingPlanId === plan.id}
-                    className="py-2.5 px-5 rounded-lg font-semibold text-xs flex items-center gap-2 transition bg-red-600 hover:bg-red-500 text-white shadow-sm shadow-red-950/40 disabled:opacity-50"
+                    className="py-2.5 px-5 rounded-lg font-semibold text-xs flex items-center gap-2 transition btn-gradient text-white shadow-sm shadow-red-950/40 disabled:opacity-50"
                   >
                     {loadingPlanId === plan.id ? (
                       <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -577,7 +577,7 @@ export function PlansSection({
                   <button
                     type="submit"
                     disabled={submittingPlan}
-                    className="py-2.5 px-5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition shadow-sm shadow-red-950/40"
+                    className="py-2.5 px-5 rounded-lg btn-gradient text-white text-xs font-semibold transition shadow-sm shadow-red-950/40"
                   >
                     {submittingPlan ? 'Salvando...' : 'Salvar Plano'}
                   </button>

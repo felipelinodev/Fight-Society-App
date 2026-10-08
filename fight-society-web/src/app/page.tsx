@@ -157,13 +157,13 @@ export default function Home() {
   };
 
   return (
-    <main className="relative w-full min-h-screen bg-[#09090b] text-zinc-100 flex flex-col justify-between">
+    <main className="relative w-full min-h-screen app-bg text-zinc-100 flex flex-col justify-between">
       {/* Scrollable Content Area */}
       <div className="flex-1 w-full max-w-3xl mx-auto overflow-y-auto px-4 py-5 sm:px-6 sm:pt-6 pb-28 sm:pb-28 space-y-6">
         {/* Payment Verification Screen */}
         {verifyingPayment && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-150">
-            <div className="bg-[#121215] rounded-xl p-6 border border-zinc-800 text-center max-w-sm mx-4 space-y-4 shadow-xl">
+            <div className="surface rounded-xl p-6 border border-zinc-800 text-center max-w-sm mx-4 space-y-4 shadow-xl">
               <div className="w-12 h-12 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center mx-auto">
                 <div className="w-6 h-6 border-2 border-zinc-500 border-t-red-600 rounded-full animate-spin" />
               </div>
@@ -238,7 +238,7 @@ export default function Home() {
             ) : (
               <button
                 onClick={handleOpenLogin}
-                className="py-1.5 px-4 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold text-xs tracking-wide transition shadow-xs"
+                className="py-1.5 px-4 rounded-lg btn-gradient text-white font-semibold text-xs tracking-wide transition shadow-xs"
               >
                 Entrar
               </button>
@@ -260,7 +260,7 @@ export default function Home() {
 
             {/* If Logged in Admin: Admin Welcome Card */}
             {user && isAdmin && (
-              <div className="p-5 rounded-xl bg-[#121215] border border-zinc-800 text-zinc-100">
+              <div className="p-5 rounded-xl surface border border-zinc-800 text-zinc-100">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-400">
                     SISTEMA DE GESTÃO INTEGRADO
@@ -286,7 +286,7 @@ export default function Home() {
                     <Swords size={11} />
                     <span>Matrículas Abertas</span>
                   </div>
-                  <h3 className="text-xl font-bold text-white tracking-tight">
+                  <h3 className="text-xl font-bold text-gradient tracking-tight">
                     Jiu Jitsu Brasileiro & Muay Thai
                   </h3>
                   <p className="text-xs sm:text-sm text-zinc-400 mt-1.5 max-w-lg leading-relaxed">
@@ -295,7 +295,7 @@ export default function Home() {
                   <div className="mt-5 flex gap-2.5">
                     <button
                       onClick={handleOpenRegister}
-                      className="py-2.5 px-4 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold text-xs tracking-wide transition shadow-sm shadow-red-950/40"
+                      className="py-2.5 px-4 rounded-lg btn-gradient text-white font-semibold text-xs tracking-wide transition shadow-sm shadow-red-950/40"
                     >
                       Criar Conta
                     </button>
@@ -327,7 +327,7 @@ export default function Home() {
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setCurrentTab('students')}
-                  className="p-3.5 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-2 group transition text-center"
+                  className="p-3.5 rounded-lg surface border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-2 group transition text-center"
                 >
                   <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-red-400 transition">
                     <Users size={16} />
@@ -337,7 +337,7 @@ export default function Home() {
 
                 <button
                   onClick={() => setCurrentTab('plans')}
-                  className="p-3.5 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-2 group transition text-center"
+                  className="p-3.5 rounded-lg surface border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-2 group transition text-center"
                 >
                   <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-red-400 transition">
                     <Swords size={16} />
@@ -347,7 +347,7 @@ export default function Home() {
 
                 <button
                   onClick={() => setCurrentTab('payments')}
-                  className="p-3.5 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-2 group transition text-center"
+                  className="p-3.5 rounded-lg surface border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-2 group transition text-center"
                 >
                   <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-red-400 transition">
                     <CreditCard size={16} />
@@ -359,7 +359,7 @@ export default function Home() {
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setCurrentTab('plans')}
-                  className="p-3 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-1.5 group transition text-center"
+                  className="p-3 rounded-lg surface border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-1.5 group transition text-center"
                 >
                   <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-red-400 transition">
                     <Swords size={16} />
@@ -369,7 +369,7 @@ export default function Home() {
 
                 <button
                   onClick={() => setCurrentTab('checkins')}
-                  className="p-3 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-1.5 group transition text-center"
+                  className="p-3 rounded-lg surface border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-1.5 group transition text-center"
                 >
                   <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-emerald-400 transition">
                     <CalendarCheck size={16} />
@@ -379,7 +379,7 @@ export default function Home() {
 
                 <button
                   onClick={() => setCurrentTab('profile')}
-                  className="p-3 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-1.5 group transition text-center"
+                  className="p-3 rounded-lg surface border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-1.5 group transition text-center"
                 >
                   <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-zinc-100 transition">
                     <UserIcon size={16} />
@@ -404,11 +404,11 @@ export default function Home() {
               </div>
 
               {payments.length === 0 ? (
-                <div className="p-4 bg-[#121215] rounded-lg border border-zinc-800 text-center text-xs text-zinc-500 font-normal">
+                <div className="p-4 surface rounded-lg border border-zinc-800 text-center text-xs text-zinc-500 font-normal">
                   Nenhum registro financeiro localizado.
                 </div>
               ) : (
-                <div className="bg-[#121215] rounded-xl border border-zinc-800 divide-y divide-zinc-800/80 overflow-hidden">
+                <div className="surface rounded-xl border border-zinc-800 divide-y divide-zinc-800/80 overflow-hidden">
                   {payments.slice(0, 3).map((p) => {
                     const isPaid = p.status === 'PAID';
                     const isPending = p.status === 'PENDING';

@@ -79,7 +79,7 @@ export function CheckoutModal({ isOpen, plan, onClose, onCheckout }: CheckoutMod
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-md bg-[#121215] rounded-xl p-6 sm:p-7 border border-zinc-800 text-zinc-100 max-h-[92vh] overflow-y-auto shadow-2xl">
+      <div className="relative w-full max-w-md surface rounded-xl p-6 sm:p-7 border border-zinc-800 text-zinc-100 max-h-[92vh] overflow-y-auto shadow-2xl">
         <button
           onClick={onClose}
           className="absolute top-5 right-5 p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded-md transition"
@@ -149,7 +149,7 @@ export function CheckoutModal({ isOpen, plan, onClose, onCheckout }: CheckoutMod
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-semibold flex items-center justify-center gap-2 transition disabled:opacity-60"
+            className="w-full py-3 rounded-lg btn-gradient text-white text-sm font-semibold flex items-center justify-center gap-2 transition disabled:opacity-60"
           >
             {loading ? (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

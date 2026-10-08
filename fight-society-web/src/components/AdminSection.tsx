@@ -226,7 +226,7 @@ export function AdminSection({ plans: initialPlans, onRefreshPlans }: AdminSecti
         {activeTab === 'enrollments' ? (
           <button
             onClick={() => setShowEnrollModal(true)}
-            className="py-2 px-3.5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95"
+            className="py-2 px-3.5 rounded-2xl btn-gradient text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95"
           >
             <UserPlus size={15} />
             <span>Matricular</span>
@@ -234,7 +234,7 @@ export function AdminSection({ plans: initialPlans, onRefreshPlans }: AdminSecti
         ) : (
           <button
             onClick={openCreatePlanModal}
-            className="py-2 px-3.5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95"
+            className="py-2 px-3.5 rounded-2xl btn-gradient text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95"
           >
             <Plus size={15} />
             <span>Novo Plano</span>
@@ -520,7 +520,7 @@ export function AdminSection({ plans: initialPlans, onRefreshPlans }: AdminSecti
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-md transition"
+                  className="flex-1 py-3 rounded-2xl btn-gradient text-white text-xs font-bold shadow-md transition"
                 >
                   {submitting ? 'Salvando...' : 'Salvar Plano'}
                 </button>
@@ -595,7 +595,7 @@ export function AdminSection({ plans: initialPlans, onRefreshPlans }: AdminSecti
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-md transition"
+                  className="flex-1 py-3 rounded-2xl btn-gradient text-white text-xs font-bold shadow-md transition"
                 >
                   {submitting ? 'Salvando...' : 'Confirmar'}
                 </button>

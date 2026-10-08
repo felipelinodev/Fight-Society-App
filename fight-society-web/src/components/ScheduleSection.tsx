@@ -208,7 +208,7 @@ export function ScheduleSection() {
         {isAdmin && (
           <button
             onClick={openCreateModal}
-            className="py-2 px-3.5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95"
+            className="py-2 px-3.5 rounded-2xl btn-gradient text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95"
           >
             <Plus size={15} />
             <span>Nova Aula</span>
@@ -394,7 +394,7 @@ export function ScheduleSection() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-md transition"
+                  className="flex-1 py-3 rounded-2xl btn-gradient text-white text-xs font-bold shadow-md transition"
                 >
                   Salvar Horário
                 </button>

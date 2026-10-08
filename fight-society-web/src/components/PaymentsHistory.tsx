@@ -64,7 +64,7 @@ export function PaymentsHistory() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 rounded-xl bg-[#121215] border border-zinc-800">
+        <div className="p-4 rounded-xl surface border border-zinc-800">
           <div className="flex items-center justify-between text-zinc-400 text-xs font-mono mb-1">
             <span>RECEITA CONFIRMADA</span>
             <CheckCircle2 size={14} className="text-emerald-400" />
@@ -75,7 +75,7 @@ export function PaymentsHistory() {
           <span className="text-[10px] font-mono text-emerald-400 block mt-0.5">Liquidado via Gateway</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#121215] border border-zinc-800">
+        <div className="p-4 rounded-xl surface border border-zinc-800">
           <div className="flex items-center justify-between text-zinc-400 text-xs font-mono mb-1">
             <span>A COMPENSAR</span>
             <Clock size={14} className="text-amber-400" />
@@ -88,7 +88,7 @@ export function PaymentsHistory() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex p-1 bg-[#121215] border border-zinc-800 rounded-lg gap-1">
+      <div className="flex p-1 surface border border-zinc-800 rounded-lg gap-1">
         {[
           { id: 'ALL', label: `Todos (${payments.length})` },
           { id: 'PAID', label: 'Liquidados' },
@@ -116,7 +116,7 @@ export function PaymentsHistory() {
             Carregando transações financeiras...
           </div>
         ) : filteredPayments.length === 0 ? (
-          <div className="p-8 text-center text-xs text-zinc-400 bg-[#121215] rounded-xl border border-zinc-800">
+          <div className="p-8 text-center text-xs text-zinc-400 surface rounded-xl border border-zinc-800">
             Nenhum registro localizado para o filtro selecionado.
           </div>
         ) : (
@@ -127,7 +127,7 @@ export function PaymentsHistory() {
             return (
               <div
                 key={p.id}
-                className="p-3.5 rounded-xl bg-[#121215] border border-zinc-800 flex items-center justify-between gap-3 hover:border-zinc-700 transition"
+                className="p-3.5 rounded-xl surface border border-zinc-800 flex items-center justify-between gap-3 hover:border-zinc-700 transition"
               >
                 <div className="flex items-center gap-3">
                   <div

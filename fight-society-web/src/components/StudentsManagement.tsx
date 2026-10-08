@@ -144,7 +144,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
 
         <button
           onClick={() => setShowEnrollModal(true)}
-          className="py-1.5 px-3.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold text-xs tracking-wide transition shadow-sm flex items-center gap-1.5 shrink-0"
+          className="py-1.5 px-3.5 rounded-lg btn-gradient text-white font-semibold text-xs tracking-wide transition shadow-sm flex items-center gap-1.5 shrink-0"
         >
           <UserPlus size={14} />
           <span>Matricular Aluno</span>
@@ -153,7 +153,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
 
       {/* KPI Cards: Mesma grade e estética de Financeiro e Painel */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-xl bg-[#121215] border border-zinc-800">
+        <div className="p-3.5 rounded-xl surface border border-zinc-800">
           <div className="flex items-center justify-between text-zinc-400 text-xs font-mono mb-1">
             <span>TOTAL</span>
             <Users size={14} className="text-zinc-400" />
@@ -164,7 +164,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
           <span className="text-[10px] font-mono text-zinc-500 block mt-0.5">Atletas cadastrados</span>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-[#121215] border border-zinc-800">
+        <div className="p-3.5 rounded-xl surface border border-zinc-800">
           <div className="flex items-center justify-between text-zinc-400 text-xs font-mono mb-1">
             <span>ATIVOS</span>
             <CheckCircle2 size={14} className="text-emerald-400" />
@@ -175,7 +175,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
           <span className="text-[10px] font-mono text-emerald-500 block mt-0.5">Acesso liberado</span>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-[#121215] border border-zinc-800">
+        <div className="p-3.5 rounded-xl surface border border-zinc-800">
           <div className="flex items-center justify-between text-zinc-400 text-xs font-mono mb-1">
             <span>EM DIA</span>
             <CreditCard size={14} className="text-zinc-400" />
@@ -186,7 +186,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
           <span className="text-[10px] font-mono text-zinc-500 block mt-0.5">Faturas liquidadas</span>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-[#121215] border border-zinc-800">
+        <div className="p-3.5 rounded-xl surface border border-zinc-800">
           <div className="flex items-center justify-between text-zinc-400 text-xs font-mono mb-1">
             <span>PENDENTES</span>
             <AlertTriangle size={14} className="text-amber-400" />
@@ -199,7 +199,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
       </div>
 
       {/* Filter Tabs - Barra segmentada unificada do app */}
-      <div className="flex p-1 bg-[#121215] border border-zinc-800 rounded-lg gap-1">
+      <div className="flex p-1 surface border border-zinc-800 rounded-lg gap-1">
         {[
           { id: 'ALL', label: `Todos (${totalStudents})` },
           { id: 'ACTIVE', label: `Ativos (${activeEnrollmentsCount})` },
@@ -229,7 +229,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
           placeholder="Buscar por nome, email ou plano..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-9 py-2.5 bg-[#121215] border border-zinc-800 rounded-lg text-xs sm:text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-red-500 transition"
+          className="w-full pl-10 pr-9 py-2.5 surface border border-zinc-800 rounded-lg text-xs sm:text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-red-500 transition"
         />
         {search && (
           <button
@@ -244,11 +244,11 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
       {/* Lista de Alunos no Formato Fight Society */}
       <div className="space-y-2.5">
         {loading ? (
-          <div className="p-8 text-center text-xs font-mono text-zinc-500 bg-[#121215] rounded-xl border border-zinc-800">
+          <div className="p-8 text-center text-xs font-mono text-zinc-500 surface rounded-xl border border-zinc-800">
             Carregando cadastro de atletas...
           </div>
         ) : filteredStudents.length === 0 ? (
-          <div className="p-8 text-center text-xs text-zinc-400 bg-[#121215] rounded-xl border border-zinc-800">
+          <div className="p-8 text-center text-xs text-zinc-400 surface rounded-xl border border-zinc-800">
             Nenhum aluno localizado para este critério.
           </div>
         ) : (
@@ -257,7 +257,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
               <div
                 key={student.id}
                 onClick={() => setSelectedStudent(student)}
-                className="group p-4 rounded-xl bg-[#121215] border border-zinc-800 hover:border-zinc-700 transition cursor-pointer space-y-3 shadow-xs"
+                className="group p-4 rounded-xl surface border border-zinc-800 hover:border-zinc-700 transition cursor-pointer space-y-3 shadow-xs"
               >
                 {/* Linha Superior: Avatar estilizado, Nome, Email e Badges Técnicas */}
                 <div className="flex items-center justify-between gap-3">
@@ -332,7 +332,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
       {/* Modal: Matricular Aluno */}
       {showEnrollModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md bg-[#121215] rounded-xl p-6 border border-zinc-800 shadow-2xl text-zinc-100">
+          <div className="relative w-full max-w-md surface rounded-xl p-6 border border-zinc-800 shadow-2xl text-zinc-100">
             <h3 className="text-base font-bold text-zinc-100 mb-1">Matricular Aluno</h3>
             <p className="text-xs text-zinc-400 mb-4">
               Vincule um atleta a um plano de treino ativo no dojo.
@@ -394,7 +394,7 @@ export function StudentsManagement({ plans }: StudentsManagementProps) {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="py-2 px-5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold tracking-wide transition shadow-sm"
+                  className="py-2 px-5 rounded-lg btn-gradient text-white text-xs font-semibold tracking-wide transition shadow-sm"
                 >
                   {submitting ? 'Gravando...' : 'Confirmar Matrícula'}
                 </button>

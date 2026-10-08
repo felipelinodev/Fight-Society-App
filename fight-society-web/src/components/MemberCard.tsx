@@ -73,7 +73,7 @@ export function MemberCard({ user, enrollment, onPayClick }: MemberCardProps) {
           {!isActive && onPayClick ? (
             <button
               onClick={onPayClick}
-              className="py-2 px-4 rounded-md bg-red-600 hover:bg-red-700 text-white font-medium text-xs tracking-wide transition shadow-none flex items-center gap-1.5 w-full sm:w-auto justify-center"
+              className="py-2 px-4 rounded-md btn-gradient text-white font-medium text-xs tracking-wide transition shadow-none flex items-center gap-1.5 w-full sm:w-auto justify-center"
             >
               <span>Regularizar Matrícula</span>
             </button>

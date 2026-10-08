@@ -45,7 +45,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-md bg-[#121215] rounded-2xl p-6 sm:p-7 border border-zinc-800 text-zinc-100 shadow-2xl">
+      <div className="relative w-full max-w-md surface rounded-2xl p-6 sm:p-7 border border-zinc-800 text-zinc-100 shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -156,7 +156,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-2.5 px-4 rounded-md bg-red-600 hover:bg-red-700 text-white font-medium text-xs tracking-wide flex items-center justify-center gap-2 transition disabled:opacity-50"
+            className="w-full mt-2 py-2.5 px-4 rounded-md btn-gradient text-white font-medium text-xs tracking-wide flex items-center justify-center gap-2 transition disabled:opacity-50"
           >
             {loading ? (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

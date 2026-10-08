@@ -81,7 +81,7 @@ export function ProfileSection() {
           <p className="text-xs font-mono uppercase tracking-widest text-zinc-400">Credenciais</p>
           <h2 className="text-lg font-bold text-zinc-100">Perfil de Usuário</h2>
         </div>
-        <div className="flex items-center gap-1.5 rounded px-2.5 py-1 text-[11px] font-mono text-zinc-400 border border-zinc-800 bg-[#121215]">
+        <div className="flex items-center gap-1.5 rounded px-2.5 py-1 text-[11px] font-mono text-zinc-400 border border-zinc-800 surface">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
           {user.role === 'ADMIN' ? 'ADMINISTRADOR' : 'ATLETA / ALUNO'}
         </div>
@@ -97,7 +97,7 @@ export function ProfileSection() {
         </div>
       )}
 
-      <form onSubmit={handleProfileSubmit} className="space-y-4 rounded-xl bg-[#121215] border border-zinc-800 p-5">
+      <form onSubmit={handleProfileSubmit} className="space-y-4 rounded-xl surface border border-zinc-800 p-5">
         <div className="flex items-center gap-3 border-b border-zinc-800/80 pb-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-800 border border-zinc-700 text-zinc-300">
             <UserIcon size={16} />
@@ -173,7 +173,7 @@ export function ProfileSection() {
         </div>
       </form>
 
-      <form onSubmit={handlePasswordSubmit} className="space-y-4 rounded-xl bg-[#121215] border border-zinc-800 p-5">
+      <form onSubmit={handlePasswordSubmit} className="space-y-4 rounded-xl surface border border-zinc-800 p-5">
         <div className="flex items-center gap-3 border-b border-zinc-800/80 pb-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-800 border border-zinc-700 text-zinc-300">
             <KeyRound size={16} />

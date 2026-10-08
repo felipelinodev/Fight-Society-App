@@ -334,7 +334,7 @@ export function PlanScheduleManager({ plan, onUpdate, isDark = false }: PlanSche
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2 rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-semibold transition"
+            className="w-full py-2 rounded-md btn-gradient text-white text-xs font-semibold transition"
           >
             {submitting ? 'Salvando...' : editingId ? 'Salvar Alterações' : 'Adicionar Horário'}
           </button>
