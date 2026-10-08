@@ -13,7 +13,7 @@ export class CreateCheckoutDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(/^d{3}.?d{3}.?d{3}-?d{2}$/, {
+  @Matches(/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/, {
     message: 'CPF must be in format 123.456.789-00 or 12345678900',
   })
   cpf?: string;
