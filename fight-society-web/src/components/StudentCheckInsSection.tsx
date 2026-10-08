@@ -1,27 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  CalendarCheck,
-  CheckCircle2,
-  Clock,
-  Swords,
-  Activity,
-  Flame,
-  Shield,
-  Zap,
-  Info,
-  Calendar,
-  Sparkles,
-} from 'lucide-react';
+import { CheckCircle2, CalendarCheck, Clock } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { CheckIn, Enrollment } from '@/types/api';
 
 export function StudentCheckInsSection() {
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
-  const [activeEnrollment, setActiveEnrollment] = useState<Enrollment | null>(null);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [selectedEnrollmentId, setSelectedEnrollmentId] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,189 +21,155 @@ export function StudentCheckInsSection() {
       api.getMyCheckIns(token).catch(() => []),
       api.getMyEnrollments(token).catch(() => []),
     ])
-      .then(([ckins, enrollments]) => {
+      .then(([ckins, userEnrollments]) => {
         setCheckIns(ckins || []);
-        const active = (enrollments || []).find((e: Enrollment) => e.status === 'ACTIVE');
-        setActiveEnrollment(active || null);
+        setEnrollments(userEnrollments || []);
       })
       .finally(() => setLoading(false));
   }, [token]);
 
-  // Calculations for statistics
-  const totalPresencas = checkIns.length;
+  // Extract unique enrollment filters with check-in counts
+  const enrollmentMap = new Map<string, { id: string; name: string; count: number }>();
 
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
-  const presencasEsteMes = checkIns.filter((ci) => {
-    const d = new Date(ci.checkedInAt);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  }).length;
+  checkIns.forEach((ci) => {
+    const eId = ci.enrollmentId || 'other';
+    const name = ci.enrollment?.plan?.name || 'Matrícula';
+    if (!enrollmentMap.has(eId)) {
+      enrollmentMap.set(eId, { id: eId, name, count: 0 });
+    }
+    enrollmentMap.get(eId)!.count += 1;
+  });
+
+  enrollments.forEach((e) => {
+    if (!enrollmentMap.has(e.id)) {
+      enrollmentMap.set(e.id, {
+        id: e.id,
+        name: e.plan?.name || 'Matrícula',
+        count: 0,
+      });
+    }
+  });
+
+  const filterOptions = Array.from(enrollmentMap.values());
+
+  const filteredCheckIns =
+    selectedEnrollmentId === 'ALL'
+      ? checkIns
+      : checkIns.filter((ci) => ci.enrollmentId === selectedEnrollmentId);
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-200">
       {/* Header */}
-      <div className="flex items-end justify-between gap-3">
+      <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-red-600">
-            Frequência & Presença
-          </p>
-          <h2 className="text-2xl font-black text-slate-900">Meus Check-ins</h2>
+          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 block">
+            REGISTRO DE ACESSO
+          </span>
+          <h2 className="text-lg font-bold text-zinc-100 mt-0.5">Histórico de Presenças</h2>
         </div>
-        <div className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[10px] font-bold text-slate-500 shadow-xs border border-slate-200">
-          <span className="h-2 w-2 rounded-full bg-emerald-500" />
-          <span>Aluno</span>
-        </div>
+        <span className="px-2.5 py-1 rounded text-[11px] font-mono font-medium bg-[#121215] text-zinc-300 border border-zinc-800">
+          {checkIns.length} {checkIns.length === 1 ? 'REGISTRO' : 'REGISTROS'}
+        </span>
       </div>
 
-      {/* Summary Highlight Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {/* Total Check-ins */}
-        <div className="p-4 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-red-950 text-white shadow-md border border-red-900/30">
-          <div className="w-8 h-8 rounded-xl bg-red-600/30 text-red-400 flex items-center justify-center mb-2">
-            <Flame size={16} />
-          </div>
-          <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">
-            Total de Treinos
-          </span>
-          <div className="text-2xl font-black mt-0.5">
-            {loading ? '—' : totalPresencas}
-          </div>
-          <span className="text-[10px] text-red-400 font-semibold mt-1 block">
-            Presenças acumuladas
-          </span>
-        </div>
-
-        {/* This Month */}
-        <div className="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-xs">
-          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2">
-            <Activity size={16} />
-          </div>
-          <span className="text-[10px] uppercase font-black tracking-wider text-slate-500 block">
-            Neste Mês
-          </span>
-          <div className="text-2xl font-black text-slate-900 mt-0.5">
-            {loading ? '—' : presencasEsteMes}
-          </div>
-          <span className="text-[10px] text-emerald-600 font-bold mt-1 block">
-            {presencasEsteMes === 1 ? '1 treino realizado' : `${presencasEsteMes} treinos realizados`}
-          </span>
-        </div>
-
-        {/* Enrollment Status */}
-        <div className="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-xs col-span-2 sm:col-span-1">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2">
-            <Shield size={16} />
-          </div>
-          <span className="text-[10px] uppercase font-black tracking-wider text-slate-500 block">
-            Matrícula
-          </span>
-          <div className="text-sm font-black text-slate-900 mt-1 truncate">
-            {activeEnrollment ? activeEnrollment.plan?.name || 'Ativa' : 'Sem Matrícula'}
-          </div>
-          <span
-            className={`text-[10px] font-bold mt-1 inline-flex items-center gap-1 ${
-              activeEnrollment ? 'text-emerald-600' : 'text-slate-400'
+      {/* Filter by Enrollment / Plan */}
+      {filterOptions.length > 0 && (
+        <div className="flex items-center gap-1.5 p-1 bg-[#121215] border border-zinc-800 rounded-lg overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => setSelectedEnrollmentId('ALL')}
+            className={`py-1.5 px-3 rounded-md text-xs font-medium transition shrink-0 flex items-center gap-1.5 ${
+              selectedEnrollmentId === 'ALL'
+                ? 'bg-zinc-800 text-zinc-100 font-semibold'
+                : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
+            <span>Todas</span>
             <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                activeEnrollment ? 'bg-emerald-500' : 'bg-slate-400'
+              className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
+                selectedEnrollmentId === 'ALL'
+                  ? 'bg-zinc-700 text-zinc-200'
+                  : 'bg-zinc-900 text-zinc-500'
               }`}
-            />
-            {activeEnrollment ? 'Liberado para treinar' : 'Matricule-se para treinar'}
-          </span>
-        </div>
-      </div>
+            >
+              {checkIns.length}
+            </span>
+          </button>
 
-      {/* Info notice about read-only policy */}
-      <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 flex items-start gap-3">
-        <Info size={16} className="text-amber-600 shrink-0 mt-0.5" />
-        <div className="text-xs text-amber-800">
-          <p className="font-bold">Como funciona o Check-in?</p>
-          <p className="text-[11px] text-amber-700/90 mt-0.5 leading-relaxed">
-            Sua presença é validada e registrada pelo professor ou pela recepção na chegada à academia.
-            Esta tela lista todo o seu histórico de treinos confirmados.
-          </p>
+          {filterOptions.map((opt) => {
+            const isSelected = selectedEnrollmentId === opt.id;
+            return (
+              <button
+                key={opt.id}
+                onClick={() => setSelectedEnrollmentId(opt.id)}
+                className={`py-1.5 px-3 rounded-md text-xs font-medium transition shrink-0 flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-zinc-800 text-zinc-100 font-semibold'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                <span className="truncate max-w-[150px]">{opt.name}</span>
+                <span
+                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
+                    isSelected
+                      ? 'bg-zinc-700 text-zinc-200'
+                      : 'bg-zinc-900 text-zinc-500'
+                  }`}
+                >
+                  {opt.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
-      </div>
+      )}
 
-      {/* History List */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <CalendarCheck size={16} className="text-red-600" />
-            <span>Histórico de Presenças</span>
-          </h3>
-          <span className="text-xs font-bold text-slate-400">
-            {checkIns.length} {checkIns.length === 1 ? 'registro' : 'registros'}
-          </span>
-        </div>
-
+      {/* Check-ins List */}
+      <div className="space-y-2">
         {loading ? (
-          <div className="p-12 text-center text-xs font-bold text-slate-400 bg-white rounded-3xl border border-slate-200/80">
-            <div className="w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            Carregando seus check-ins...
+          <div className="py-10 text-center text-xs font-mono text-zinc-500 bg-[#121215] rounded-xl border border-zinc-800">
+            Carregando registros de check-in...
           </div>
-        ) : checkIns.length === 0 ? (
-          <div className="p-10 bg-white rounded-3xl border border-slate-200/80 text-center space-y-3 shadow-xs">
-            <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto">
-              <CalendarCheck size={26} />
+        ) : filteredCheckIns.length === 0 ? (
+          <div className="py-10 text-center bg-[#121215] rounded-xl border border-zinc-800 p-6 space-y-2">
+            <div className="w-9 h-9 rounded-md bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto border border-zinc-700">
+              <CalendarCheck size={18} />
             </div>
-            <div>
-              <h4 className="text-sm font-black text-slate-900">
-                Nenhum check-in registrado ainda
-              </h4>
-              <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
-                Assim que você comparecer aos treinos e seu professor registrar sua presença, ela aparecerá aqui!
-              </p>
-            </div>
+            <p className="text-xs font-bold text-zinc-300">Nenhum check-in registrado</p>
+            <p className="text-[11px] text-zinc-500">
+              Aproxime seu código QR na catraca para registrar presença na aula.
+            </p>
           </div>
         ) : (
-          <div className="space-y-2.5">
-            {checkIns.map((ci, index) => {
-              const date = new Date(ci.checkedInAt);
+          filteredCheckIns.map((ci) => {
+            const date = new Date(ci.checkedInAt);
+            const planName = ci.enrollment?.plan?.name || 'Treino';
 
-              return (
-                <div
-                  key={ci.id}
-                  className="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 hover:shadow-md transition-all flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-                      <CheckCircle2 size={20} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-black text-slate-900 truncate">
-                          {ci.enrollment?.plan?.name || 'Treino Fight Society'}
-                        </h4>
-                        {index === 0 && (
-                          <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-600 text-[9px] font-black uppercase tracking-wider">
-                            Último
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5 truncate">
-                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <span className="truncate">{ci.note || 'Presença confirmada pelo professor'}</span>
-                      </p>
-                    </div>
+            return (
+              <div
+                key={ci.id}
+                className="p-3 rounded-xl bg-[#121215] border border-zinc-800 hover:border-zinc-700 transition flex items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-md bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 flex items-center justify-center shrink-0">
+                    <CheckCircle2 size={15} />
                   </div>
-
-                  {/* Date & Time */}
-                  <div className="text-right shrink-0 pl-2">
-                    <span className="text-xs font-black text-slate-900 block">
-                      {date.toLocaleDateString('pt-BR')}
-                    </span>
-                    <span className="text-[10px] font-bold text-slate-500 flex items-center justify-end gap-1 mt-0.5">
-                      <Clock size={10} />
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-bold text-zinc-200 truncate">
+                      {planName}
+                    </h4>
+                    <span className="text-[11px] font-mono text-zinc-500">
+                      {date.toLocaleDateString('pt-BR')} às{' '}
                       {date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                <span className="shrink-0 px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-emerald-950/60 text-emerald-400 border border-emerald-800/60">
+                  Confirmado
+                </span>
+              </div>
+            );
+          })
         )}
       </div>
     </div>

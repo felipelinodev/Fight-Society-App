@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
 import { PaymentController } from './payment.controller';
-import { StripeWebhookController } from './stripe-webhook.controller';
+import { AsaasWebhookController } from './asaas-webhook.controller';
 import { PaymentService } from './payment.service';
 import { PaymentRepository } from './payment.repository';
-import { StripeService } from './stripe.service';
+import { AsaasService } from './asaas.service';
 import { PAYMENT_REPOSITORY } from './interfaces/payment-repository.interface';
 
 @Module({
-  controllers: [PaymentController, StripeWebhookController],
+  controllers: [PaymentController, AsaasWebhookController],
   providers: [
     PaymentService,
-    StripeService,
+    AsaasService,
     {
       provide: PAYMENT_REPOSITORY,
       useClass: PaymentRepository,
     },
   ],
-  exports: [PaymentService, StripeService],
+  exports: [PaymentService, AsaasService],
 })
 export class PaymentsModule {}

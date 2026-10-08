@@ -1,6 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import {
   IsEnum,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -43,14 +44,14 @@ class EnvironmentVariables {
   JWT_REFRESH_EXPIRES_IN: string = '7d';
 
   @IsString()
-  STRIPE_PUBLIC_KEY!: string;
+  ASAAS_API_KEY!: string;
 
-  @IsString()
-  STRIPE_SECRET_KEY!: string;
-
-  @IsString()
+  @IsIn(['sandbox', 'production'])
   @IsOptional()
-  STRIPE_WEBHOOK_SECRET?: string;
+  ASAAS_ENV: 'sandbox' | 'production' = 'sandbox';
+
+  @IsString()
+  ASAAS_WEBHOOK_TOKEN!: string;
 
   @IsString()
   @IsOptional()

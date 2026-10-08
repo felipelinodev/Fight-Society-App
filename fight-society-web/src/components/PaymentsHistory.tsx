@@ -48,62 +48,60 @@ export function PaymentsHistory() {
   });
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-5 animate-in fade-in duration-200">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
         <div>
-          <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <span>{isAdmin ? 'Financeiro da Academia' : 'Meus Pagamentos'}</span>
-            <CreditCard className="w-5 h-5 text-red-600" />
+          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 block">
+            CONCILIAÇÃO & RECEBÍVEIS
+          </span>
+          <h2 className="text-lg font-bold text-zinc-100 flex items-center gap-2 mt-0.5">
+            <span>{isAdmin ? 'Módulo Financeiro' : 'Histórico de Faturamento'}</span>
+            <CreditCard className="w-4 h-4 text-red-500" />
           </h2>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            {isAdmin
-              ? 'Histórico geral de todas as cobranças da academia'
-              : 'Histórico dos seus pagamentos e mensalidades'}
-          </p>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
-            <span>Total Recebido</span>
-            <CheckCircle2 size={15} className="text-emerald-600" />
+        <div className="p-4 rounded-xl bg-[#121215] border border-zinc-800">
+          <div className="flex items-center justify-between text-zinc-400 text-xs font-mono mb-1">
+            <span>RECEITA CONFIRMADA</span>
+            <CheckCircle2 size={14} className="text-emerald-400" />
           </div>
-          <div className="text-xl sm:text-2xl font-black text-emerald-600">
+          <div className="text-xl sm:text-2xl font-bold font-mono text-zinc-100">
             R$ {totalPaid.toFixed(2)}
           </div>
-          <span className="text-[10px] text-slate-400 font-medium">Pagamentos aprovados</span>
+          <span className="text-[10px] font-mono text-emerald-400 block mt-0.5">Liquidado via Gateway</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
-            <span>Pendente</span>
-            <Clock size={15} className="text-amber-500" />
+        <div className="p-4 rounded-xl bg-[#121215] border border-zinc-800">
+          <div className="flex items-center justify-between text-zinc-400 text-xs font-mono mb-1">
+            <span>A COMPENSAR</span>
+            <Clock size={14} className="text-amber-400" />
           </div>
-          <div className="text-xl sm:text-2xl font-black text-amber-500">
+          <div className="text-xl sm:text-2xl font-bold font-mono text-zinc-100">
             R$ {totalPending.toFixed(2)}
           </div>
-          <span className="text-[10px] text-slate-400 font-medium">Aguardando confirmação</span>
+          <span className="text-[10px] font-mono text-amber-400 block mt-0.5">Cobranças em aberto</span>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex p-1.5 bg-slate-200/80 rounded-2xl gap-1">
+      <div className="flex p-1 bg-[#121215] border border-zinc-800 rounded-lg gap-1">
         {[
           { id: 'ALL', label: `Todos (${payments.length})` },
-          { id: 'PAID', label: 'Pagos' },
+          { id: 'PAID', label: 'Liquidados' },
           { id: 'PENDING', label: 'Pendentes' },
-          { id: 'FAILED', label: 'Falhou' },
+          { id: 'FAILED', label: 'Cancelados' },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setFilter(tab.id as any)}
-            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+            className={`flex-1 py-1.5 rounded-md text-xs font-medium transition ${
               filter === tab.id
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-zinc-800 text-zinc-100 font-semibold'
+                : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
             {tab.label}
@@ -112,14 +110,14 @@ export function PaymentsHistory() {
       </div>
 
       {/* Payments List */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         {loading ? (
-          <div className="p-8 text-center text-xs font-bold text-slate-400">
-            Carregando pagamentos...
+          <div className="p-8 text-center text-xs font-mono text-zinc-500">
+            Carregando transações financeiras...
           </div>
         ) : filteredPayments.length === 0 ? (
-          <div className="p-8 text-center text-xs font-semibold text-slate-500 bg-white rounded-2xl border border-slate-200">
-            Nenhum pagamento registrado neste filtro.
+          <div className="p-8 text-center text-xs text-zinc-400 bg-[#121215] rounded-xl border border-zinc-800">
+            Nenhum registro localizado para o filtro selecionado.
           </div>
         ) : (
           filteredPayments.map((p) => {
@@ -129,25 +127,25 @@ export function PaymentsHistory() {
             return (
               <div
                 key={p.id}
-                className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between gap-3 hover:border-red-200 transition"
+                className="p-3.5 rounded-xl bg-[#121215] border border-zinc-800 flex items-center justify-between gap-3 hover:border-zinc-700 transition"
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
+                    className={`w-8 h-8 rounded-md flex items-center justify-center border ${
                       isPaid
-                        ? 'bg-emerald-50 text-emerald-600'
+                        ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/60'
                         : isPending
-                        ? 'bg-amber-50 text-amber-600'
-                        : 'bg-rose-50 text-rose-600'
+                        ? 'bg-amber-950/60 text-amber-400 border-amber-800/60'
+                        : 'bg-red-950/60 text-red-400 border-red-800/60'
                     }`}
                   >
-                    {isPaid ? <CheckCircle2 size={20} /> : isPending ? <Clock size={20} /> : <XCircle size={20} />}
+                    {isPaid ? <CheckCircle2 size={16} /> : isPending ? <Clock size={16} /> : <XCircle size={16} />}
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-slate-900">
-                      {p.enrollment?.plan?.name || 'Mensalidade'}
+                    <h4 className="text-xs font-bold text-zinc-200">
+                      {p.enrollment?.plan?.name || 'Mensalidade Fight Society'}
                     </h4>
-                    <p className="text-[11px] text-slate-500 font-medium">
+                    <p className="text-[10px] font-mono text-zinc-500">
                       {p.paidAt
                         ? new Date(p.paidAt).toLocaleDateString('pt-BR', {
                             day: '2-digit',
@@ -161,15 +159,15 @@ export function PaymentsHistory() {
                 </div>
 
                 <div className="text-right">
-                  <span className="text-sm font-black text-slate-900 block">
+                  <span className="text-xs font-mono font-bold text-zinc-100 block">
                     R$ {Number(p.amount).toFixed(2)}
                   </span>
                   <span
-                    className={`text-[10px] font-bold ${
-                      isPaid ? 'text-emerald-600' : isPending ? 'text-amber-600' : 'text-rose-600'
+                    className={`text-[10px] font-mono uppercase ${
+                      isPaid ? 'text-emerald-400' : isPending ? 'text-amber-400' : 'text-red-400'
                     }`}
                   >
-                    {isPaid ? 'Confirmado' : isPending ? 'Pendente' : 'Recusado'}
+                    {isPaid ? 'Liquidado' : isPending ? 'Pendente' : 'Recusado'}
                   </span>
                 </div>
               </div>

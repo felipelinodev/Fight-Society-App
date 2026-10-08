@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { User, Enrollment } from '@/types/api';
 import { ShieldCheck, CheckCircle2, AlertCircle, Calendar, CreditCard, Swords } from 'lucide-react';
 
@@ -19,80 +20,89 @@ export function MemberCard({ user, enrollment, onPayClick }: MemberCardProps) {
   const planPrice = enrollment?.plan?.price ? Number(enrollment.plan.price).toFixed(2) : '0.00';
 
   return (
-    <div className="relative w-full rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-red-950 text-white p-6 shadow-2xl border border-red-900/30 overflow-hidden group">
-      {/* Background Glow */}
-      <div className="absolute -right-16 -top-16 w-52 h-52 bg-red-600/20 rounded-full blur-2xl pointer-events-none" />
-      <div className="absolute -left-16 -bottom-16 w-52 h-52 bg-rose-600/10 rounded-full blur-2xl pointer-events-none" />
-      
-      {/* Card Header */}
-      <div className="relative z-10 flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-2xl bg-red-600 flex items-center justify-center shadow-md">
-            <Swords className="w-5 h-5 text-white" />
+    <div className="relative w-full rounded-2xl bg-gradient-to-br from-[#141418] to-[#18181f] border border-zinc-800 text-zinc-100 p-6 overflow-hidden shadow-sm">
+      {/* Top Bar / Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80 mb-5">
+        <div className="flex items-center gap-3">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden border border-red-500/40 bg-black shrink-0 shadow-sm">
+            <Image
+              src="/logo_dojo.jpg"
+              alt="Fight Society"
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
-            <span className="text-[10px] font-bold tracking-wider uppercase text-red-400 block">
-              FIGHT SOCIETY ACADEMY
+            <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-400 block font-semibold">
+              FIGHT SOCIETY — ID PASS
             </span>
-            <span className="text-xs font-bold text-slate-300">
-              {isBJJ ? 'Jiu Jitsu Brasileiro' : isThai ? 'Muay Thai' : 'Cartão de Matrícula'}
+            <span className="text-xs font-semibold text-white">
+              {isBJJ ? 'Jiu Jitsu Brasileiro' : isThai ? 'Muay Thai' : 'Credencial de Membro'}
             </span>
           </div>
         </div>
 
         <div>
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-mono font-medium tracking-wide uppercase ${
             isActive 
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-              : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+              ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/60'
+              : 'bg-amber-950/50 text-amber-400 border border-amber-800/50'
           }`}>
-            {isActive ? <CheckCircle2 size={13} /> : <AlertCircle size={13} />}
-            {isActive ? 'Ativa' : 'Pendente'}
+            <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+            {isActive ? 'Ativo' : 'Pendente'}
           </span>
         </div>
       </div>
 
-      {/* Card Body / Plan & Price */}
-      <div className="relative z-10 mb-6">
-        <div className="text-xs font-semibold text-slate-400 mb-1">
-          Plano Contratado
-        </div>
-        <div className="flex items-baseline justify-between">
-          <div className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            R$ {planPrice}
-            <span className="text-xs font-normal text-slate-400 ml-1">/período</span>
+      {/* Main Stats / Plan Info */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div>
+          <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider block mb-1">
+            Plano Contratado
+          </span>
+          <div className="text-lg font-bold text-zinc-100 tracking-tight">
+            {planName}
           </div>
-          {!isActive && onPayClick && (
+          <div className="text-xs text-zinc-400 mt-0.5">
+            R$ {planPrice} <span className="text-zinc-400">/ ciclo</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:items-end justify-center">
+          {!isActive && onPayClick ? (
             <button
               onClick={onPayClick}
-              className="py-1.5 px-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-md transition transform active:scale-95"
+              className="py-2 px-4 rounded-md bg-red-600 hover:bg-red-700 text-white font-medium text-xs tracking-wide transition shadow-none flex items-center gap-1.5 w-full sm:w-auto justify-center"
             >
-              Matricular
+              <span>Regularizar Matrícula</span>
             </button>
+          ) : (
+            <div className="text-right">
+              <span className="text-[10px] font-mono text-zinc-400 uppercase block">Situação</span>
+              <span className="text-xs font-semibold text-emerald-400">Acesso Liberado</span>
+            </div>
           )}
-        </div>
-        <div className="text-xs font-bold text-red-300 mt-1">
-          {planName}
         </div>
       </div>
 
-      {/* Card Footer */}
-      <div className="relative z-10 flex items-center justify-between pt-4 border-t border-white/10 text-xs font-mono">
+      {/* Footer Info */}
+      <div className="pt-4 border-t border-zinc-800/60 flex items-center justify-between text-xs">
         <div>
-          <span className="text-[9px] text-slate-500 uppercase tracking-wider block font-sans">
-            Aluno
+          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">
+            Titular
           </span>
-          <span className="font-bold text-slate-200 tracking-wide">
-            {user.name.toUpperCase()}
+          <span className="font-semibold text-zinc-200 tracking-tight">
+            {user.name}
           </span>
         </div>
 
         <div className="text-right">
-          <span className="text-[9px] text-slate-500 uppercase tracking-wider block font-sans">
-            Status da Mensalidade
+          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">
+            ID de Registro
           </span>
-          <span className={`font-bold ${isActive ? 'text-emerald-400' : 'text-amber-400'}`}>
-            {isActive ? 'EM DIA' : 'PENDENTE'}
+          <span className="font-mono text-xs text-zinc-400">
+            #{user.id ? user.id.slice(0, 8).toUpperCase() : 'FS-001'}
           </span>
         </div>
       </div>

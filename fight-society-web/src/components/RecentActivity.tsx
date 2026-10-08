@@ -59,7 +59,7 @@ export function RecentActivity({ payments, onViewAll }: RecentActivityProps) {
       </div>
 
       <div className="space-y-3">
-        {/* Real Payments from Stripe if available */}
+        {/* Real payments if available */}
         {payments && payments.length > 0 && payments.slice(0, 2).map((payment) => {
           const isPaid = payment.status === 'PAID';
           const isPending = payment.status === 'PENDING';
@@ -82,7 +82,7 @@ export function RecentActivity({ payments, onViewAll }: RecentActivityProps) {
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-slate-900">
-                    {payment.enrollment?.plan?.name || 'Mensalidade Stripe'}
+                    {payment.enrollment?.plan?.name || 'Mensalidade'}
                   </h4>
                   <p className="text-[11px] font-medium text-slate-500">
                     {payment.paidAt

@@ -5,9 +5,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    rawBody: true, // Required for Stripe webhook signature verification
-  });
+  const app = await NestFactory.create(AppModule);
 
   // Global prefix
   app.setGlobalPrefix('api');
@@ -50,7 +48,7 @@ async function bootstrap() {
     .setTitle(appName)
     .setDescription(
       'API para gerenciamento de academia de artes marciais — Jiu Jitsu e Muay Thai. ' +
-      'Gerencia matrículas, planos, pagamentos via Stripe e autenticação JWT.',
+      'Gerencia matrículas, planos, pagamentos via Asaas e autenticação JWT.',
     )
     .setVersion('1.0.0')
     .addBearerAuth()
@@ -58,7 +56,7 @@ async function bootstrap() {
     .addTag('Users', 'Gerenciamento de usuários')
     .addTag('Plans', 'Planos de treino')
     .addTag('Enrollments', 'Matrículas')
-    .addTag('Payments', 'Pagamentos via Stripe')
+    .addTag('Payments', 'Pagamentos via Asaas')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -26,8 +26,6 @@ interface StudentDetailModalProps {
   onRefresh: () => void;
 }
 
-const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-
 export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: StudentDetailModalProps) {
   const { token } = useAuth();
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -71,31 +69,31 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-150 p-0 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-lg max-h-[90vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-4 duration-300"
+        className="relative w-full max-w-lg max-h-[90vh] bg-[#121215] rounded-t-xl sm:rounded-xl border border-zinc-800 shadow-2xl overflow-hidden flex flex-col text-zinc-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="relative p-5 pb-4 bg-gradient-to-br from-slate-950 via-slate-900 to-red-950 text-white shrink-0">
+        <div className="relative p-5 pb-4 bg-[#121215] border-b border-zinc-800 shrink-0">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition text-white/80 hover:text-white"
+            className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition"
           >
             <X size={18} />
           </button>
 
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-500 to-rose-600 text-white flex items-center justify-center font-black text-lg shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 flex items-center justify-center font-mono font-bold text-sm shrink-0">
               {student.name.slice(0, 2).toUpperCase()}
             </div>
-            <div className="min-w-0">
-              <h3 className="text-lg font-black truncate">{student.name}</h3>
-              <p className="text-xs text-white/70 flex items-center gap-1.5 truncate">
-                <Mail size={12} />
-                {student.email}
+            <div className="min-w-0 pr-8">
+              <h3 className="text-base font-bold text-zinc-100 truncate">{student.name}</h3>
+              <p className="text-xs font-mono text-zinc-400 flex items-center gap-1.5 truncate mt-0.5">
+                <Mail size={12} className="shrink-0 text-zinc-500" />
+                <span className="truncate">{student.email}</span>
               </p>
             </div>
           </div>
@@ -103,47 +101,49 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
           {/* Quick Status Badges */}
           <div className="mt-3 flex flex-wrap gap-2">
             <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold ${
+              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono uppercase ${
                 hasActiveEnrollment
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
-                  : 'bg-white/10 text-white/60 border border-white/10'
+                  ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/60'
+                  : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
               }`}
             >
-              {hasActiveEnrollment ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
-              {hasActiveEnrollment ? 'Matrícula Ativa' : 'Sem Matrícula'}
+              {hasActiveEnrollment ? <CheckCircle2 size={11} /> : <XCircle size={11} />}
+              <span>{hasActiveEnrollment ? 'Matrícula Ativa' : 'Sem Matrícula'}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30">
-              <Activity size={12} />
-              {checkIns.length} Check-ins
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
+              <Activity size={11} className="text-zinc-400" />
+              <span>{checkIns.length} {checkIns.length === 1 ? 'Presença' : 'Presenças'}</span>
             </span>
           </div>
         </div>
 
-        {/* Detail Tabs */}
-        <div className="flex border-b border-slate-200 shrink-0">
-          {[
-            { id: 'info' as const, label: 'Informações' },
-            { id: 'payments' as const, label: `Pagamentos (${payments.length})` },
-            { id: 'checkins' as const, label: `Presenças (${checkIns.length})` },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveDetailTab(tab.id)}
-              className={`flex-1 py-3 text-xs font-bold transition-all ${
-                activeDetailTab === tab.id
-                  ? 'text-red-600 border-b-2 border-red-600'
-                  : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Detail Tabs - Segmented Control do App */}
+        <div className="p-2 border-b border-zinc-800 shrink-0 bg-[#0d0d10]">
+          <div className="flex p-1 bg-[#121215] border border-zinc-800 rounded-lg gap-1">
+            {[
+              { id: 'info' as const, label: 'Informações' },
+              { id: 'payments' as const, label: `Pagamentos (${payments.length})` },
+              { id: 'checkins' as const, label: `Presenças (${checkIns.length})` },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveDetailTab(tab.id)}
+                className={`flex-1 py-1.5 rounded-md text-xs font-medium transition ${
+                  activeDetailTab === tab.id
+                    ? 'bg-zinc-800 text-zinc-100 font-semibold'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {loadingData ? (
-            <div className="py-8 text-center text-xs font-bold text-slate-400">Carregando dados...</div>
+            <div className="py-8 text-center text-xs font-mono text-zinc-500">Carregando dados...</div>
           ) : (
             <>
               {/* INFO TAB */}
@@ -151,23 +151,23 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
                 <div className="space-y-4">
                   {/* Personal Info */}
                   <div className="space-y-2">
-                    <h4 className="text-xs font-black text-slate-700 uppercase tracking-wide">Dados Pessoais</h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                        <span className="text-[10px] text-slate-500 font-bold uppercase">Email</span>
-                        <p className="text-xs font-bold text-slate-900 truncate mt-0.5">{student.email}</p>
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">Dados Cadastrais</h4>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div className="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800">
+                        <span className="text-[10px] font-mono text-zinc-500 uppercase block">Email</span>
+                        <p className="text-xs font-medium text-zinc-200 truncate mt-0.5">{student.email}</p>
                       </div>
-                      <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                        <span className="text-[10px] text-slate-500 font-bold uppercase">Telefone</span>
-                        <p className="text-xs font-bold text-slate-900 mt-0.5">{student.phone || '—'}</p>
+                      <div className="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800">
+                        <span className="text-[10px] font-mono text-zinc-500 uppercase block">Telefone</span>
+                        <p className="text-xs font-medium text-zinc-200 mt-0.5">{student.phone || '—'}</p>
                       </div>
-                      <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                        <span className="text-[10px] text-slate-500 font-bold uppercase">CPF</span>
-                        <p className="text-xs font-bold text-slate-900 mt-0.5">{student.cpf || '—'}</p>
+                      <div className="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800">
+                        <span className="text-[10px] font-mono text-zinc-500 uppercase block">CPF</span>
+                        <p className="text-xs font-medium text-zinc-200 mt-0.5">{student.cpf || '—'}</p>
                       </div>
-                      <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                        <span className="text-[10px] text-slate-500 font-bold uppercase">Cadastro</span>
-                        <p className="text-xs font-bold text-slate-900 mt-0.5">
+                      <div className="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800">
+                        <span className="text-[10px] font-mono text-zinc-500 uppercase block">Registro</span>
+                        <p className="text-xs font-medium text-zinc-200 mt-0.5">
                           {new Date(student.createdAt).toLocaleDateString('pt-BR')}
                         </p>
                       </div>
@@ -176,39 +176,39 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
 
                   {/* Enrollment Info */}
                   <div className="space-y-2">
-                    <h4 className="text-xs font-black text-slate-700 uppercase tracking-wide">Matrícula</h4>
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">Plano Contratado</h4>
                     {enrollment ? (
-                      <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-3">
+                      <div className="p-3.5 rounded-lg bg-zinc-900/90 border border-zinc-800 space-y-3">
                         <div className="flex items-center gap-2">
-                          <Swords size={16} className="text-red-600" />
-                          <span className="text-sm font-black text-slate-900">
-                            {enrollment.plan?.name || 'Plano desconhecido'}
+                          <Swords size={15} className="text-red-500" />
+                          <span className="text-xs font-bold text-zinc-100">
+                            {enrollment.plan?.name || 'Plano Fight Society'}
                           </span>
                         </div>
-                        <div className="grid grid-cols-3 gap-2 text-center">
-                          <div className="p-2 rounded-xl bg-slate-50">
-                            <span className="text-[10px] text-slate-500 font-bold block">Status</span>
-                            <span className={`text-xs font-black ${hasActiveEnrollment ? 'text-emerald-600' : 'text-slate-500'}`}>
-                              {enrollment.status === 'ACTIVE' ? 'Ativa' : 'Inativa'}
+                        <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                          <div className="p-2 rounded bg-zinc-950 border border-zinc-800/80">
+                            <span className="text-[10px] font-mono text-zinc-500 block uppercase">Status</span>
+                            <span className={`text-xs font-mono font-bold ${hasActiveEnrollment ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                              {enrollment.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
                             </span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-50">
-                            <span className="text-[10px] text-slate-500 font-bold block">Início</span>
-                            <span className="text-xs font-black text-slate-900">
+                          <div className="p-2 rounded bg-zinc-950 border border-zinc-800/80">
+                            <span className="text-[10px] font-mono text-zinc-500 block uppercase">Início</span>
+                            <span className="text-xs font-mono text-zinc-200">
                               {new Date(enrollment.startDate).toLocaleDateString('pt-BR')}
                             </span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-50">
-                            <span className="text-[10px] text-slate-500 font-bold block">Valor</span>
-                            <span className="text-xs font-black text-slate-900">
+                          <div className="p-2 rounded bg-zinc-950 border border-zinc-800/80">
+                            <span className="text-[10px] font-mono text-zinc-500 block uppercase">Valor</span>
+                            <span className="text-xs font-mono font-bold text-zinc-100">
                               R$ {Number(enrollment.plan?.price || 0).toFixed(2)}
                             </span>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center text-xs text-slate-500 font-medium">
-                        Nenhuma matrícula encontrada
+                      <div className="p-4 rounded-lg bg-zinc-900/90 border border-zinc-800 text-center text-xs text-zinc-500">
+                        Nenhuma matrícula vinculada.
                       </div>
                     )}
                   </div>
@@ -218,26 +218,22 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
                     <button
                       onClick={handleCheckIn}
                       disabled={checkingIn}
-                      className={`w-full py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
-                        checkInSuccess
-                          ? 'bg-emerald-500 text-white'
-                          : 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg shadow-red-500/25 hover:from-red-500 hover:to-rose-500'
-                      }`}
+                      className="w-full py-2.5 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 transition bg-red-600 hover:bg-red-500 text-white disabled:opacity-50 shadow-sm"
                     >
                       {checkingIn ? (
                         <>
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Registrando...
+                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Registrando...</span>
                         </>
                       ) : checkInSuccess ? (
                         <>
-                          <CheckCircle2 size={18} />
-                          Check-in Registrado! ✓
+                          <CheckCircle2 size={15} />
+                          <span>Presença Registrada com Sucesso</span>
                         </>
                       ) : (
                         <>
-                          <UserCheck size={18} />
-                          Registrar Check-in
+                          <UserCheck size={15} />
+                          <span>Registrar Presença Manual</span>
                         </>
                       )}
                     </button>
@@ -249,8 +245,8 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
               {activeDetailTab === 'payments' && (
                 <div className="space-y-2">
                   {payments.length === 0 ? (
-                    <div className="py-8 text-center text-xs font-medium text-slate-500">
-                      Nenhum pagamento encontrado
+                    <div className="py-8 text-center text-xs font-mono text-zinc-500">
+                      Nenhum pagamento registrado.
                     </div>
                   ) : (
                     payments.map((p) => {
@@ -260,43 +256,43 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
                       return (
                         <div
                           key={p.id}
-                          className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between"
+                          className="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800 flex items-center justify-between"
                         >
                           <div className="flex items-center gap-3">
                             <div
-                              className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                              className={`w-7 h-7 rounded flex items-center justify-center border text-xs shrink-0 ${
                                 isPaid
-                                  ? 'bg-emerald-50 text-emerald-600'
+                                  ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/60'
                                   : isPending
-                                  ? 'bg-amber-50 text-amber-600'
-                                  : 'bg-rose-50 text-rose-600'
+                                  ? 'bg-amber-950/60 text-amber-400 border-amber-800/60'
+                                  : 'bg-red-950/60 text-red-400 border-red-800/60'
                               }`}
                             >
-                              {isPaid ? <CheckCircle2 size={16} /> : isPending ? <Clock size={16} /> : <AlertTriangle size={16} />}
+                              {isPaid ? <CheckCircle2 size={13} /> : isPending ? <Clock size={13} /> : <AlertTriangle size={13} />}
                             </div>
                             <div>
-                              <h4 className="text-xs font-bold text-slate-900">
-                                {p.enrollment?.plan?.name || 'Pagamento'}
+                              <h4 className="text-xs font-medium text-zinc-200">
+                                {p.enrollment?.plan?.name || 'Mensalidade'}
                               </h4>
-                              <span className="text-[10px] text-slate-400">
+                              <span className="text-[10px] font-mono text-zinc-500 block mt-0.5">
                                 {p.paidAt
                                   ? new Date(p.paidAt).toLocaleDateString('pt-BR')
                                   : isPending
-                                  ? 'Aguardando'
-                                  : 'Não Concluído'}
+                                  ? 'Aguardando compensação'
+                                  : 'Não concluído'}
                               </span>
                             </div>
                           </div>
                           <div className="text-right">
-                            <span className="text-xs font-black text-slate-900 block">
+                            <span className="text-xs font-mono font-bold text-zinc-100 block">
                               R$ {Number(p.amount).toFixed(2)}
                             </span>
                             <span
-                              className={`text-[10px] font-bold ${
-                                isPaid ? 'text-emerald-600' : isPending ? 'text-amber-600' : 'text-rose-600'
+                              className={`text-[10px] font-mono uppercase ${
+                                isPaid ? 'text-emerald-400' : isPending ? 'text-amber-400' : 'text-red-400'
                               }`}
                             >
-                              {isPaid ? 'Pago' : isPending ? 'Pendente' : 'Recusado'}
+                              {isPaid ? 'Liquidado' : isPending ? 'Pendente' : 'Recusado'}
                             </span>
                           </div>
                         </div>
@@ -313,41 +309,41 @@ export function StudentDetailModal({ student, enrollment, onClose, onRefresh }: 
                     <button
                       onClick={handleCheckIn}
                       disabled={checkingIn}
-                      className="w-full py-3 mb-2 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold text-xs shadow-lg shadow-red-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                      className="w-full py-2 mb-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium text-xs border border-zinc-700 flex items-center justify-center gap-1.5 transition"
                     >
-                      <UserCheck size={15} />
-                      {checkingIn ? 'Registrando...' : checkInSuccess ? 'Check-in Registrado! ✓' : 'Novo Check-in'}
+                      <UserCheck size={14} />
+                      {checkingIn ? 'Registrando...' : checkInSuccess ? 'Presença Registrada' : 'Adicionar Presença'}
                     </button>
                   )}
 
                   {checkIns.length === 0 ? (
-                    <div className="py-8 text-center text-xs font-medium text-slate-500">
-                      Nenhum check-in registrado
+                    <div className="py-8 text-center text-xs font-mono text-zinc-500">
+                      Nenhum check-in registrado.
                     </div>
                   ) : (
                     checkIns.map((ci) => (
                       <div
                         key={ci.id}
-                        className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between"
+                        className="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800 flex items-center justify-between"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <UserCheck size={16} />
+                          <div className="w-7 h-7 rounded bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 flex items-center justify-center shrink-0">
+                            <UserCheck size={14} />
                           </div>
                           <div>
-                            <h4 className="text-xs font-bold text-slate-900">
+                            <h4 className="text-xs font-medium text-zinc-200">
                               {ci.enrollment?.plan?.name || 'Treino'}
                             </h4>
-                            <span className="text-[10px] text-slate-400">
-                              {ci.note || 'Check-in registrado'}
+                            <span className="text-[10px] font-mono text-zinc-500 block mt-0.5">
+                              {ci.note || 'Acesso registrado'}
                             </span>
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="text-xs font-bold text-slate-900 block">
+                          <span className="text-xs font-mono font-medium text-zinc-300 block">
                             {new Date(ci.checkedInAt).toLocaleDateString('pt-BR')}
                           </span>
-                          <span className="text-[10px] text-slate-500">
+                          <span className="text-[10px] font-mono text-zinc-500">
                             {new Date(ci.checkedInAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>

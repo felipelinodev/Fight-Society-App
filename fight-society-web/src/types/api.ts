@@ -18,6 +18,7 @@ export interface PlanSchedule {
   startTime: string;
   endTime: string;
   instructor?: string;
+  note?: string;
 }
 
 export interface Plan {
@@ -52,6 +53,8 @@ export interface Payment {
   enrollmentId: string;
   amount: number | string;
   status: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+  method?: 'PIX' | 'BOLETO' | 'CREDIT_CARD' | 'DEBIT_CARD' | null;
+  invoiceUrl?: string | null;
   paidAt?: string;
   createdAt: string;
   enrollment?: {

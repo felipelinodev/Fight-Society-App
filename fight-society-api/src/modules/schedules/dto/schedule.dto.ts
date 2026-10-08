@@ -1,10 +1,11 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import {
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
 } from 'class-validator';
 
@@ -29,4 +30,12 @@ export class CreateScheduleDto {
   @IsString()
   @IsOptional()
   instructor?: string;
+
+  @ApiPropertyOptional({ example: 'Traga kimono e protetor bucal' })
+  @IsString()
+  @IsOptional()
+  @MaxLength(500)
+  note?: string;
 }
+
+export class UpdateScheduleDto extends PartialType(CreateScheduleDto) {}

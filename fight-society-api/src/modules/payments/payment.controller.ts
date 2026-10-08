@@ -48,18 +48,19 @@ export class PaymentController {
   }
 
   @Post('checkout')
-  @ApiOperation({ summary: 'Create Stripe checkout session for enrollment payment' })
+  @ApiOperation({ summary: 'Create Asaas charge for enrollment payment' })
   @ApiResponse({
     status: 201,
-    description: 'Checkout session created — returns URL',
+    description: 'Charge created — returns the Asaas invoice URL',
   })
   async createCheckout(
     @CurrentUser('id') userId: string,
     @Body() createCheckoutDto: CreateCheckoutDto,
   ) {
-    return this.paymentService.createCheckoutSession(
+    return this.paymentService.createCheckout(
       userId,
       createCheckoutDto.enrollmentId,
+      createCheckoutDto.cpf,
     );
   }
 }

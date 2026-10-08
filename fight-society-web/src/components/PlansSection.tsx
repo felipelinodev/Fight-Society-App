@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { Plan, MartialArt } from '@/types/api';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import { Shield, Zap, Check, ArrowRight, Sparkles, Plus, Edit2, Flame, Swords, Trash2 } from 'lucide-react';
-import { PixCheckoutModal } from '@/components/PixCheckoutModal';
+import { Shield, Zap, ArrowRight, Sparkles, Plus, Edit2, Flame, Swords, Trash2, X } from 'lucide-react';
+import { CheckoutModal } from '@/components/CheckoutModal';
 import { PlanScheduleManager } from '@/components/PlanScheduleManager';
 
 interface PlansSectionProps {
@@ -28,9 +28,8 @@ export function PlansSection({
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Pix/Card checkout modal
+  // Asaas checkout modal
   const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
-  const [isCardLoading, setIsCardLoading] = useState(false);
 
   // Edit / Create Plan Modal State
   const [showPlanModal, setShowPlanModal] = useState(false);
@@ -97,27 +96,18 @@ export function PlansSection({
     setCheckoutPlan(plan);
   };
 
-  const handlePayWithCard = async () => {
+  const handleCheckout = async (cpf?: string) => {
     if (!user || !token || !checkoutPlan) return;
-    setIsCardLoading(true);
-    try {
-      let userEnrollments = await api.getMyEnrollments(token);
-      let enrollment = userEnrollments.find((e) => e.planId === checkoutPlan.id);
-      if (!enrollment) {
-        enrollment = await api.createEnrollment(user.id, checkoutPlan.id, token);
-      }
-      const { checkoutUrl } = await api.createCheckout(enrollment.id, token);
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      } else {
-        throw new Error('Não foi possível gerar a URL de pagamento do Stripe.');
-      }
-    } catch (err: any) {
-      setErrorMsg(err?.message || 'Erro ao processar pagamento.');
-      setCheckoutPlan(null);
-    } finally {
-      setIsCardLoading(false);
+    const userEnrollments = await api.getMyEnrollments(token);
+    let enrollment = userEnrollments.find((e) => e.planId === checkoutPlan.id);
+    if (!enrollment) {
+      enrollment = await api.createEnrollment(user.id, checkoutPlan.id, token);
     }
+    const { invoiceUrl } = await api.createCheckout(enrollment.id, token, cpf);
+    if (!invoiceUrl) {
+      throw new Error('Não foi possível gerar a cobrança.');
+    }
+    window.location.href = invoiceUrl;
   };
 
   const openCreatePlanModal = () => {
@@ -215,66 +205,65 @@ export function PlansSection({
   return (
     <div className="w-full space-y-5">
       {/* Section Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pb-1">
         <div>
-          <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <span>Planos de Treino</span>
-            <Flame className="w-5 h-5 text-red-600 fill-red-600" />
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            Planos de Treino
           </h2>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Acesso ilimitado ao dojô com pagamentos seguros via Stripe
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+            Acesso ilimitado ao dojô com pagamento via PIX, boleto ou cartão
           </p>
         </div>
 
         {isAdmin && (
           <button
             onClick={openCreatePlanModal}
-            className="py-2 px-3.5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95"
+            className="py-2 px-3.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold text-xs flex items-center gap-1.5 transition shadow-sm"
           >
-            <Plus size={15} />
-            <span>Novo Plano</span>
+            <Plus size={14} />
+            <span>Criar Plano</span>
           </button>
         )}
       </div>
 
       {errorMsg && (
-        <div className="p-3.5 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-xs font-semibold">
+        <div className="p-3 bg-red-950/60 border border-red-800/80 rounded-md text-red-300 text-xs font-medium">
           {errorMsg}
         </div>
       )}
 
-      {/* Martial Art Filter Tabs */}
-      <div className="flex p-1.5 bg-slate-200/80 rounded-2xl gap-1">
+      {/* Martial Art Filter Tabs - Flat Pro */}
+      <div className="flex p-1 bg-[#121215] border border-zinc-800 rounded-lg gap-1">
         <button
           onClick={() => setSelectedArt('ALL')}
-          className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+          className={`flex-1 py-1.5 rounded-md text-xs font-medium transition ${
             selectedArt === 'ALL'
-              ? 'bg-red-600 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
+              ? 'bg-zinc-800 text-zinc-100 font-semibold'
+              : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
           Todos
         </button>
         <button
           onClick={() => setSelectedArt('JIU_JITSU')}
-          className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-1.5 rounded-md text-xs font-medium transition flex items-center justify-center gap-1.5 ${
             selectedArt === 'JIU_JITSU'
-              ? 'bg-red-600 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
+              ? 'bg-zinc-800 text-zinc-100 font-semibold'
+              : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
-          <Shield size={14} />
+          <Shield size={13} />
           <span>Jiu Jitsu</span>
         </button>
         <button
           onClick={() => setSelectedArt('MUAY_THAI')}
-          className={`flex-1 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-1.5 rounded-md text-xs font-medium transition flex items-center justify-center gap-1.5 ${
             selectedArt === 'MUAY_THAI'
-              ? 'bg-red-600 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
+              ? 'bg-zinc-800 text-zinc-100 font-semibold'
+              : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
-          <Swords size={14} />
+          <Swords size={13} />
           <span>Muay Thai</span>
         </button>
       </div>
@@ -282,340 +271,329 @@ export function PlansSection({
       {/* Plan Cards Grid */}
       <div className="grid grid-cols-1 gap-4">
         {filteredPlans.length === 0 ? (
-          <div className="p-8 bg-white rounded-3xl border border-slate-200/80 text-center space-y-3 shadow-xs">
-            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto">
-              <Swords size={22} />
+          <div className="p-8 bg-[#121215] rounded-xl border border-zinc-800 text-center space-y-3">
+            <div className="w-10 h-10 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto border border-zinc-700">
+              <Swords size={18} />
             </div>
             <div>
-              <h4 className="text-sm font-black text-slate-900">Nenhum plano encontrado</h4>
-              <p className="text-xs text-slate-500 mt-1">
+              <h4 className="text-sm font-bold text-zinc-200">Nenhum plano disponível</h4>
+              <p className="text-xs text-zinc-400 mt-1">
                 Não há planos cadastrados para este filtro no momento.
               </p>
             </div>
             <button
               onClick={() => setSelectedArt('ALL')}
-              className="py-2 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition"
+              className="py-1.5 px-4 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium text-xs transition border border-zinc-700"
             >
               Ver Todos os Planos
             </button>
           </div>
         ) : (
           filteredPlans.map((plan) => {
-          const isBJJ = plan.martialArt === 'JIU_JITSU';
-          const isQuarterly = plan.durationDays >= 90 && plan.durationDays < 180;
-          const isSemiAnnual = plan.durationDays >= 180;
-          const isPopular = isQuarterly || isSemiAnnual;
+            const isBJJ = plan.martialArt === 'JIU_JITSU';
+            const isQuarterly = plan.durationDays >= 90 && plan.durationDays < 180;
+            const isSemiAnnual = plan.durationDays >= 180;
+            const isPopular = isQuarterly || isSemiAnnual;
 
-          return (
-            <div
-              key={plan.id}
-              className={`relative p-5 rounded-3xl transition-all duration-300 border ${
-                isPopular
-                  ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-red-950 text-white border-red-800/40 shadow-xl'
-                  : 'bg-white text-slate-900 border-slate-200/80 shadow-xs hover:border-red-200'
-              }`}
-            >
-              {isPopular && (
-                <div className="absolute -top-2.5 right-6 px-3 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-wider shadow-md flex items-center gap-1">
-                  <Sparkles size={11} />
-                  <span>Mais Escolhido</span>
-                </div>
-              )}
-
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
-                      isPopular ? 'bg-red-600 text-white' : 'bg-red-50 text-red-600'
-                    }`}
-                  >
-                    {isBJJ ? <Shield size={20} /> : <Zap size={20} />}
-                  </div>
-                  <div>
-                    <h3 className={`text-base font-black tracking-tight ${isPopular ? 'text-white' : 'text-slate-900'}`}>
-                      {plan.name}
-                    </h3>
-                    <span className={`text-[11px] font-bold ${isPopular ? 'text-red-400' : 'text-slate-500'}`}>
-                      {isBJJ ? 'Jiu Jitsu' : 'Muay Thai'} • {getDurationLabel(plan.durationDays)}
-                    </span>
-                  </div>
-                </div>
-
-                {isAdmin && (
-                  <button
-                    onClick={() => openEditPlanModal(plan)}
-                    className={`py-1.5 px-3 rounded-xl text-xs font-bold flex items-center gap-1 transition ${
-                      isPopular
-                        ? 'bg-white/10 hover:bg-white/20 text-white'
-                        : 'bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600'
-                    }`}
-                    title="Editar Preço e Dados do Plano"
-                  >
-                    <Edit2 size={12} />
-                    <span>Editar</span>
-                  </button>
-                )}
-              </div>
-
-              {plan.description && (
-                <p className={`text-xs mb-4 ${isPopular ? 'text-slate-400' : 'text-slate-600'}`}>
-                  {plan.description}
-                </p>
-              )}
-
-              {/* Training Schedules */}
-              <div className="mb-4">
-                <PlanScheduleManager
-                  plan={plan}
-                  onUpdate={() => onRefreshPlans?.()}
-                  isDark={isPopular}
-                />
-              </div>
-
-              {/* Features List */}
-              <div className="space-y-2 mb-5">
-                {[
-                  'Aulas ilimitadas durante a vigência',
-                  'Acompanhamento de graduação e evolução',
-                  'Acesso com QR Code na catraca',
-                  'Pagamento seguro com Stripe',
-                ].map((feat, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-xs font-medium">
-                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                      isPopular ? 'bg-red-500/20 text-red-400' : 'bg-emerald-50 text-emerald-600'
-                    }`}>
-                      <Check size={10} className="stroke-[3]" />
+            return (
+              <div
+                key={plan.id}
+                className={`relative p-5 sm:p-6 rounded-xl transition border bg-[#121215] ${
+                  isPopular
+                    ? 'border-zinc-700 shadow-sm'
+                    : 'border-zinc-800 hover:border-zinc-700'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3 mb-5">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 flex items-center justify-center shrink-0">
+                      {isBJJ ? <Shield size={19} /> : <Zap size={19} />}
                     </div>
-                    <span className={isPopular ? 'text-slate-300' : 'text-slate-700'}>{feat}</span>
+                    <div className="min-w-0">
+                      <h3 className="text-base font-bold text-white tracking-tight truncate">
+                        {plan.name}
+                      </h3>
+                      <span className="text-xs font-medium text-zinc-400">
+                        {isBJJ ? 'Jiu Jitsu' : 'Muay Thai'} • {getDurationLabel(plan.durationDays)}
+                      </span>
+                    </div>
                   </div>
-                ))}
-              </div>
 
-              {/* Price & Action Button */}
-              <div className="flex items-center justify-between pt-4 border-t border-slate-200/20">
-                <div>
-                  <span className={`text-[10px] uppercase font-bold tracking-wider block ${
-                    isPopular ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
-                    Investimento
-                  </span>
-                  <div className="flex items-baseline gap-1">
-                    <span className={`text-2xl font-black ${isPopular ? 'text-white' : 'text-slate-900'}`}>
-                      R$ {Number(plan.price).toFixed(2)}
-                    </span>
-                    <span className={`text-xs font-semibold ${isPopular ? 'text-slate-400' : 'text-slate-500'}`}>
-                      {getPeriodSuffix(plan.durationDays)}
-                    </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {isPopular && (
+                      <div className="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/30 font-semibold">
+                        Recomendado
+                      </div>
+                    )}
+
+                    {isAdmin && (
+                      <button
+                        onClick={() => openEditPlanModal(plan)}
+                        className="py-1 px-2.5 rounded-md text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 flex items-center gap-1.5 transition"
+                        title="Editar Preço e Dados do Plano"
+                      >
+                        <Edit2 size={12} />
+                        <span>Editar</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleEnrollClick(plan)}
-                  disabled={loadingPlanId === plan.id}
-                  className={`py-3 px-5 rounded-2xl font-bold text-xs flex items-center gap-2 transition transform active:scale-95 shadow-md ${
-                    isPopular
-                      ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/30'
-                      : 'bg-slate-900 hover:bg-slate-800 text-white shadow-slate-900/20'
-                  }`}
-                >
-                  {loadingPlanId === plan.id ? (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <span>Matricular Agora</span>
-                      <ArrowRight size={14} />
-                    </>
+                <div className="space-y-5 mb-6">
+                  {/* Description */}
+                  {plan.description && (
+                    <p className="text-[15px] text-zinc-300 leading-7 whitespace-pre-line break-words pb-5 border-b border-zinc-800">
+                      {plan.description}
+                    </p>
                   )}
-                </button>
-              </div>
-            </div>
-          );
-        })
-      )}
-    </div>
 
-      {/* Create / Edit Plan Modal (Integrated directly in Plans Section) */}
+                  {/* Training Schedules */}
+                  <PlanScheduleManager
+                    plan={plan}
+                    onUpdate={() => onRefreshPlans?.()}
+                    isDark={true}
+                  />
+                </div>
+
+                {/* Price & Action Button */}
+                <div className="flex items-center justify-between pt-5 border-t border-zinc-800">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
+                      Valor da Assinatura
+                    </span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-xs font-semibold text-zinc-400">R$</span>
+                      <span className="text-2xl font-extrabold text-white tracking-tight">
+                        {Number(plan.price).toFixed(2)}
+                      </span>
+                      <span className="text-xs text-zinc-400 font-medium">
+                        {getPeriodSuffix(plan.durationDays)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleEnrollClick(plan)}
+                    disabled={loadingPlanId === plan.id}
+                    className="py-2.5 px-5 rounded-lg font-semibold text-xs flex items-center gap-2 transition bg-red-600 hover:bg-red-500 text-white shadow-sm shadow-red-950/40 disabled:opacity-50"
+                  >
+                    {loadingPlanId === plan.id ? (
+                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <span>Matricular</span>
+                        <ArrowRight size={14} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Create / Edit Plan Modal */}
       {showPlanModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-red-100 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-black text-slate-900 mb-1">
-              {editingPlan ? 'Editar Valor & Dados do Plano' : 'Criar Novo Plano'}
-            </h3>
-            <p className="text-xs text-slate-500 mb-4">
-              Altere o valor em R$, nome, duração ou modalidade do plano.
-            </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-[#141418] rounded-2xl p-6 sm:p-7 border border-zinc-800 max-h-[92vh] overflow-y-auto shadow-2xl text-zinc-100">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-4 border-b border-zinc-800/80 mb-5">
+              <div>
+                <h3 className="text-lg font-bold text-white tracking-tight">
+                  {editingPlan ? 'Editar Plano' : 'Novo Plano de Treino'}
+                </h3>
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Defina os parâmetros técnicos e comerciais do plano de treino.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPlanModal(false)}
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition -mr-1 -mt-1"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
             {modalFeedback && (
-              <div className="mb-4 p-3 rounded-2xl bg-red-50 text-red-700 text-xs font-semibold">
+              <div className="mb-5 p-3 rounded-lg bg-red-950/70 border border-red-800/80 text-red-300 text-xs font-medium">
                 {modalFeedback}
               </div>
             )}
 
             <form onSubmit={handleSavePlan} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase">
+                <label className="block text-xs font-semibold text-zinc-200 mb-1.5">
                   Nome do Plano
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Jiu Jitsu Mensal VIP"
+                  placeholder="Ex: Jiu Jitsu Mensal"
                   value={planName}
                   onChange={(e) => setPlanName(e.target.value)}
-                  className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full py-2.5 px-3.5 bg-zinc-900 border border-zinc-700/80 rounded-lg text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-red-500 transition"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase">
-                  Modalidade
-                </label>
-                <select
-                  value={planMartialArt}
-                  onChange={(e) => setPlanMartialArt(e.target.value as any)}
-                  className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  <option value="JIU_JITSU">Jiu Jitsu</option>
-                  <option value="MUAY_THAI">Muay Thai</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-200 mb-1.5">
+                    Modalidade
+                  </label>
+                  <select
+                    value={planMartialArt}
+                    onChange={(e) => setPlanMartialArt(e.target.value as any)}
+                    className="w-full py-2.5 px-3 bg-zinc-900 border border-zinc-700/80 rounded-lg text-sm text-zinc-100 focus:outline-none focus:border-red-500 transition"
+                  >
+                    <option value="JIU_JITSU">Jiu Jitsu</option>
+                    <option value="MUAY_THAI">Muay Thai</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-200 mb-1.5">
+                    Valor (R$)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2.5 text-xs font-semibold text-zinc-500">
+                      R$
+                    </span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      required
+                      placeholder="150.00"
+                      value={planPrice}
+                      onChange={(e) => setPlanPrice(e.target.value)}
+                      className="w-full py-2.5 pl-9 pr-3 bg-zinc-900 border border-zinc-700/80 rounded-lg text-sm font-semibold text-zinc-100 focus:outline-none focus:border-red-500 transition"
+                    />
+                  </div>
+                </div>
               </div>
 
+              {/* Recurrence / Period Selection */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase">
-                  Valor / Preço (R$)
+                <label className="block text-xs font-semibold text-zinc-200 mb-1.5">
+                  Ciclo de Cobrança
                 </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  required
-                  placeholder="150.00"
-                  value={planPrice}
-                  onChange={(e) => setPlanPrice(e.target.value)}
-                  className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-black text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
-              </div>
-
-              {/* Recurrence / Period Flags */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase">
-                  Recorrência do Plano
-                </label>
-                <div className="grid grid-cols-3 gap-2 mb-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
-                    { label: 'Mensal', days: '30' },
-                    { label: 'Trimestral', days: '90' },
-                    { label: 'Semestral', days: '180' },
-                    { label: 'Anual', days: '365' },
-                    { label: 'Bimestral', days: '60' },
-                    { label: 'Outro', days: 'custom' },
+                    { label: 'Mensal', days: '30', desc: '30 dias' },
+                    { label: 'Trimestral', days: '90', desc: '90 dias' },
+                    { label: 'Semestral', days: '180', desc: '180 dias' },
+                    { label: 'Anual', days: '365', desc: '365 dias' },
                   ].map((p) => {
-                    const isSelected =
-                      p.days === 'custom'
-                        ? !['30', '60', '90', '180', '365'].includes(planDurationDays)
-                        : planDurationDays === p.days;
+                    const isSelected = planDurationDays === p.days;
 
                     return (
                       <button
-                        key={p.label}
+                        key={p.days}
                         type="button"
-                        onClick={() => {
-                          if (p.days !== 'custom') {
-                            setPlanDurationDays(p.days);
-                          }
-                        }}
-                        className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all border ${
+                        onClick={() => setPlanDurationDays(p.days)}
+                        className={`py-2 px-3 rounded-lg text-left transition border ${
                           isSelected
-                            ? 'bg-red-600 text-white border-red-600 shadow-sm'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            ? 'bg-red-500/10 border-red-500/40 text-white'
+                            : 'bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:bg-zinc-800/80 hover:text-zinc-200'
                         }`}
                       >
-                        {p.label}
+                        <span className="block text-xs font-semibold">{p.label}</span>
+                        <span className={`text-[10px] ${isSelected ? 'text-red-400 font-medium' : 'text-zinc-500'}`}>
+                          {p.desc}
+                        </span>
                       </button>
                     );
                   })}
                 </div>
 
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-[11px] font-semibold text-slate-500">
-                    Duração em dias:
+                {/* Custom Days Input if needed */}
+                <div className="mt-2.5 flex items-center justify-between text-xs text-zinc-400 bg-zinc-900/60 p-2.5 rounded-lg border border-zinc-800/80">
+                  <span className="text-[11px] font-medium text-zinc-400">
+                    Duração efetiva:{' '}
+                    <strong className="text-zinc-200 font-semibold">
+                      {planDurationDays === '30'
+                        ? '1 mês (30 dias)'
+                        : planDurationDays === '90'
+                        ? '3 meses (90 dias)'
+                        : planDurationDays === '180'
+                        ? '6 meses (180 dias)'
+                        : planDurationDays === '365'
+                        ? '1 ano (365 dias)'
+                        : `${planDurationDays} dias`}
+                    </strong>
                   </span>
-                  <input
-                    type="number"
-                    required
-                    min={1}
-                    value={planDurationDays}
-                    onChange={(e) => setPlanDurationDays(e.target.value)}
-                    className="w-24 py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500"
-                  />
-                  <span className="text-[11px] text-slate-400">
-                    ({planDurationDays === '30'
-                      ? '1 mês'
-                      : planDurationDays === '90'
-                      ? '3 meses'
-                      : planDurationDays === '180'
-                      ? '6 meses'
-                      : planDurationDays === '365'
-                      ? '1 ano'
-                      : `${planDurationDays} dias`})
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-zinc-500">Dias:</span>
+                    <input
+                      type="number"
+                      required
+                      min={1}
+                      value={planDurationDays}
+                      onChange={(e) => setPlanDurationDays(e.target.value)}
+                      className="w-16 py-1 px-2 bg-zinc-950 border border-zinc-700/80 rounded-md text-xs font-mono font-semibold text-zinc-100 text-center focus:outline-none focus:border-red-500"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase">
-                  Descrição
+                <label className="block text-xs font-semibold text-zinc-200 mb-1.5">
+                  Descrição e Benefícios
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Detalhes e benefícios do plano..."
+                  placeholder="Descreva as vantagens e turmas inclusas neste plano..."
                   value={planDescription}
                   onChange={(e) => setPlanDescription(e.target.value)}
-                  className="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full py-2.5 px-3 bg-zinc-900 border border-zinc-700/80 rounded-lg text-xs text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-red-500 resize-none transition"
                 />
               </div>
 
-              <div className="flex gap-2 pt-2">
-                {editingPlan && (
+              {/* Modal Footer with Balanced Actions */}
+              <div className="flex items-center justify-between pt-4 border-t border-zinc-800/80 mt-5">
+                {editingPlan ? (
                   <button
                     type="button"
                     onClick={handleDeletePlan}
                     disabled={submittingPlan}
-                    className="py-3 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition"
+                    className="py-2.5 px-3.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/25 text-xs font-medium flex items-center gap-1.5 transition"
                   >
-                    Excluir
+                    <Trash2 size={13} />
+                    <span>Excluir</span>
                   </button>
+                ) : (
+                  <div />
                 )}
-                <button
-                  type="button"
-                  onClick={() => setShowPlanModal(false)}
-                  className="flex-1 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={submittingPlan}
-                  className="flex-1 py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-md transition"
-                >
-                  {submittingPlan ? 'Salvando...' : 'Salvar Plano'}
-                </button>
+
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setShowPlanModal(false)}
+                    className="py-2.5 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submittingPlan}
+                    className="py-2.5 px-5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition shadow-sm shadow-red-950/40"
+                  >
+                    {submittingPlan ? 'Salvando...' : 'Salvar Plano'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Pix / Card Checkout Modal */}
-      <PixCheckoutModal
+      {/* Asaas Checkout Modal */}
+      <CheckoutModal
         isOpen={checkoutPlan !== null}
         plan={checkoutPlan}
         onClose={() => setCheckoutPlan(null)}
-        onPayWithCard={handlePayWithCard}
-        isCardLoading={isCardLoading}
-        onEnrollmentSuccess={() => {
-          setCheckoutPlan(null);
-          if (onEnrollmentSuccess) onEnrollmentSuccess();
-        }}
+        onCheckout={handleCheckout}
       />
     </div>
   );

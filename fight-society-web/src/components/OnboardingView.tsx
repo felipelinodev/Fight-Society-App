@@ -65,7 +65,7 @@ export function OnboardingView({ onStart }: OnboardingViewProps) {
           </span>
         </h1>
         <p className="mt-3 text-xs sm:text-sm text-white/80 font-medium leading-relaxed">
-          Gerencie sua matrícula de Jiu Jitsu e Muay Thai, realize pagamentos instantâneos com Stripe e acompanhe sua evolução.
+          Gerencie sua matrícula de Jiu Jitsu e Muay Thai, pague via PIX, boleto ou cartão e acompanhe sua evolução.
         </p>
 
         {/* Bottom Action Row (Matching Screen 1) */}

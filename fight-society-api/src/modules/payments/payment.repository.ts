@@ -47,17 +47,9 @@ export class PaymentRepository implements IPaymentRepository {
     });
   }
 
-  async findByStripePaymentIntentId(
-    paymentIntentId: string,
-  ): Promise<Payment | null> {
+  async findByAsaasPaymentId(asaasPaymentId: string): Promise<Payment | null> {
     return this.prisma.payment.findUnique({
-      where: { stripePaymentIntentId: paymentIntentId },
-    });
-  }
-
-  async findByStripeCheckoutSessionId(sessionId: string): Promise<Payment | null> {
-    return this.prisma.payment.findUnique({
-      where: { stripeCheckoutSessionId: sessionId },
+      where: { asaasPaymentId },
     });
   }
 
@@ -65,12 +57,6 @@ export class PaymentRepository implements IPaymentRepository {
     return this.prisma.payment.findFirst({
       where: { enrollmentId, status: 'PENDING' },
       orderBy: { createdAt: 'desc' },
-    });
-  }
-
-  async findByStripeInvoiceId(invoiceId: string): Promise<Payment | null> {
-    return this.prisma.payment.findUnique({
-      where: { stripeInvoiceId: invoiceId },
     });
   }
 
@@ -95,13 +81,9 @@ export class PaymentRepository implements IPaymentRepository {
     });
   }
 
-  async updateByStripePaymentIntentId(
-    paymentIntentId: string,
-    data: Partial<Payment>,
-  ): Promise<Payment> {
-    return this.prisma.payment.update({
-      where: { stripePaymentIntentId: paymentIntentId },
-      data,
+  async delete(id: string): Promise<Payment> {
+    return this.prisma.payment.delete({
+      where: { id },
     });
   }
 }

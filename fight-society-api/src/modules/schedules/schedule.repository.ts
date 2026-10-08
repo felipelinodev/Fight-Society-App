@@ -25,8 +25,25 @@ export class ScheduleRepository {
     startTime: string;
     endTime: string;
     instructor?: string;
+    note?: string;
   }) {
     return this.prisma.planSchedule.create({
+      data,
+    });
+  }
+
+  async update(
+    id: string,
+    data: {
+      dayOfWeek?: number;
+      startTime?: string;
+      endTime?: string;
+      instructor?: string;
+      note?: string;
+    },
+  ) {
+    return this.prisma.planSchedule.update({
+      where: { id },
       data,
     });
   }

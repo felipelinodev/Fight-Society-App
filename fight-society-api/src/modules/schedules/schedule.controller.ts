@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Delete,
   Body,
   Param,
@@ -15,7 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { ScheduleService } from './schedule.service';
-import { CreateScheduleDto } from './dto/schedule.dto';
+import { CreateScheduleDto, UpdateScheduleDto } from './dto/schedule.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 
@@ -50,6 +51,17 @@ export class ScheduleController {
     @Body() dto: CreateScheduleDto,
   ) {
     return this.scheduleService.create(planId, dto);
+  }
+
+  @Put('schedules/:id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Update a schedule (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Schedule updated' })
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateScheduleDto,
+  ) {
+    return this.scheduleService.update(id, dto);
   }
 
   @Delete('schedules/:id')

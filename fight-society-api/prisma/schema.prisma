@@ -42,6 +42,7 @@ enum PaymentMethod {
   CREDIT_CARD
   DEBIT_CARD
   PIX
+  BOLETO
 }
 
 // ============================================
@@ -57,6 +58,7 @@ model User {
   cpf                String?  @unique
   role               Role     @default(STUDENT)
   stripeCustomerId   String?  @unique @map("stripe_customer_id")
+  asaasCustomerId    String?  @unique @map("asaas_customer_id")
   active             Boolean  @default(true)
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
@@ -124,6 +126,8 @@ model Payment {
   stripeCheckoutSessionId String?     @unique @map("stripe_checkout_session_id")
   stripePaymentIntentId String?       @unique @map("stripe_payment_intent_id")
   stripeInvoiceId       String?       @unique @map("stripe_invoice_id")
+  asaasPaymentId        String?       @unique @map("asaas_payment_id")
+  invoiceUrl            String?       @map("invoice_url")
   paidAt                DateTime?     @map("paid_at")
   createdAt             DateTime      @default(now()) @map("created_at")
 
@@ -140,6 +144,7 @@ model PlanSchedule {
   startTime  String   @map("start_time")
   endTime    String   @map("end_time")
   instructor String?
+  note       String?
   createdAt  DateTime @default(now()) @map("created_at")
 
   plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)

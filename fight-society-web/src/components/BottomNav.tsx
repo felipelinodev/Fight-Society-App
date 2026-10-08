@@ -18,18 +18,18 @@ interface NavItem {
 }
 
 const studentItems: NavItem[] = [
-  { tab: 'home', title: 'Minha matrícula', icon: LayoutDashboard },
+  { tab: 'home', title: 'Início', icon: LayoutDashboard },
   { tab: 'checkins', title: 'Check-in', icon: CalendarCheck },
-  { tab: 'plans', title: 'Planos de treino', icon: Swords },
-  { tab: 'profile', title: 'Meu perfil', icon: UserIcon },
+  { tab: 'plans', title: 'Planos', icon: Swords },
+  { tab: 'profile', title: 'Perfil', icon: UserIcon },
 ];
 
 const adminItems: NavItem[] = [
-  { tab: 'home', title: 'Painel geral', icon: LayoutDashboard },
-  { tab: 'students', title: 'Gestão de alunos', icon: Users },
-  { tab: 'plans', title: 'Gerenciar planos', icon: Swords },
+  { tab: 'home', title: 'Painel', icon: LayoutDashboard },
+  { tab: 'students', title: 'Alunos', icon: Users },
+  { tab: 'plans', title: 'Planos', icon: Swords },
   { tab: 'payments', title: 'Financeiro', icon: CreditCard },
-  { tab: 'profile', title: 'Meu perfil', icon: UserIcon },
+  { tab: 'profile', title: 'Perfil', icon: UserIcon },
 ];
 
 export function BottomNav({ currentTab, onSelectTab }: BottomNavProps) {
@@ -37,8 +37,8 @@ export function BottomNav({ currentTab, onSelectTab }: BottomNavProps) {
   const items = user?.role === 'ADMIN' ? adminItems : studentItems;
 
   return (
-    <nav className="floating-nav" aria-label="Navegação principal">
-      <div className="floating-nav__inner">
+    <nav className="flat-nav" aria-label="Navegação principal">
+      <div className="flat-nav__inner">
         {items.map(({ tab, title, icon: Icon }) => {
           const isActive = currentTab === tab;
 
@@ -50,9 +50,14 @@ export function BottomNav({ currentTab, onSelectTab }: BottomNavProps) {
               title={title}
               aria-label={title}
               aria-current={isActive ? 'page' : undefined}
-              className={`floating-nav__item ${isActive ? 'floating-nav__item--active' : ''}`}
+              className={`flat-nav__item ${isActive ? 'flat-nav__item--active' : ''}`}
             >
-              <Icon size={20} strokeWidth={isActive ? 2.6 : 2} aria-hidden="true" />
+              <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} className={isActive ? 'text-red-500' : 'text-zinc-400'} aria-hidden="true" />
+              <span className={`text-[11px] font-medium tracking-tight transition-colors ${
+                isActive ? 'text-white font-semibold' : 'text-zinc-400'
+              }`}>
+                {title}
+              </span>
             </button>
           );
         })}

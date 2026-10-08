@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ScheduleRepository } from './schedule.repository';
+import { UpdateScheduleDto } from './dto/schedule.dto';
 
 @Injectable()
 export class ScheduleService {
@@ -20,9 +21,18 @@ export class ScheduleService {
       startTime: string;
       endTime: string;
       instructor?: string;
+      note?: string;
     },
   ) {
     return this.scheduleRepository.create({ planId, ...data });
+  }
+
+  async update(id: string, data: UpdateScheduleDto) {
+    const schedule = await this.scheduleRepository.findById(id);
+    if (!schedule) {
+      throw new NotFoundException('Schedule not found');
+    }
+    return this.scheduleRepository.update(id, data);
   }
 
   async delete(id: string) {

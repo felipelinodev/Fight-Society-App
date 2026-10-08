@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { Enrollment, Payment, Plan } from '@/types/api';
@@ -31,49 +32,6 @@ import {
   CalendarCheck,
 } from 'lucide-react';
 
-const DEFAULT_FALLBACK_PLANS: Plan[] = [
-  {
-    id: 'bjj-mensal',
-    name: 'Jiu Jitsu Mensal',
-    description: 'Acesso completo a todas as turmas de Jiu Jitsu (Gi e No-Gi)',
-    price: 150.0,
-    durationDays: 30,
-    martialArt: 'JIU_JITSU',
-    active: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'bjj-trimestral',
-    name: 'Jiu Jitsu Trimestral',
-    description: 'Acesso trimestral com desconto exclusivo',
-    price: 390.0,
-    durationDays: 90,
-    martialArt: 'JIU_JITSU',
-    active: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'muay-mensal',
-    name: 'Muay Thai Mensal',
-    description: 'Treinos de Muay Thai de segunda a sexta com Kru certificado',
-    price: 140.0,
-    durationDays: 30,
-    martialArt: 'MUAY_THAI',
-    active: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'thai-trimestral',
-    name: 'Muay Thai Trimestral',
-    description: 'Treino intensivo trimestral com foco em técnica e condicionamento',
-    price: 360.0,
-    durationDays: 90,
-    martialArt: 'MUAY_THAI',
-    active: true,
-    createdAt: new Date().toISOString(),
-  },
-];
-
 export default function Home() {
   const { user, token, logout, isLoading } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -85,7 +43,7 @@ export default function Home() {
   const [verifyingPayment, setVerifyingPayment] = useState(false);
 
   // Data from API
-  const [plans, setPlans] = useState<Plan[]>(DEFAULT_FALLBACK_PLANS);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
 
@@ -108,15 +66,11 @@ export default function Home() {
     api
       .getPlans(token)
       .then((data) => {
-        if (data && data.length > 0) {
-          setPlans(data);
-        } else {
-          setPlans(DEFAULT_FALLBACK_PLANS);
-        }
+        setPlans(data ?? []);
       })
       .catch((e) => {
         console.error('Erro ao carregar planos', e);
-        setPlans(DEFAULT_FALLBACK_PLANS);
+        setPlans([]);
       });
   };
 
@@ -132,7 +86,7 @@ export default function Home() {
     }
   }, [token, user]);
 
-  // Handle Stripe redirect: ?payment=success&session_id=...
+  // Handle Asaas redirect: ?payment=success
   useEffect(() => {
     if (!token || !user) return;
 
@@ -203,23 +157,23 @@ export default function Home() {
   };
 
   return (
-    <main className="relative w-full min-h-screen bg-slate-50 overflow-hidden flex flex-col justify-between">
+    <main className="relative w-full min-h-screen bg-[#09090b] text-zinc-100 flex flex-col justify-between">
       {/* Scrollable Content Area */}
-      <div className="flex-1 w-full max-w-3xl mx-auto overflow-y-auto px-4 py-5 sm:px-5 sm:pt-6 pb-32 sm:pb-32 space-y-6">
-        {/* Payment Verification Loading Screen */}
+      <div className="flex-1 w-full max-w-3xl mx-auto overflow-y-auto px-4 py-5 sm:px-6 sm:pt-6 pb-28 sm:pb-28 space-y-6">
+        {/* Payment Verification Screen */}
         {verifyingPayment && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl p-8 shadow-2xl text-center max-w-sm mx-4 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto">
-                <div className="w-8 h-8 border-[3px] border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-150">
+            <div className="bg-[#121215] rounded-xl p-6 border border-zinc-800 text-center max-w-sm mx-4 space-y-4 shadow-xl">
+              <div className="w-12 h-12 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center mx-auto">
+                <div className="w-6 h-6 border-2 border-zinc-500 border-t-red-600 rounded-full animate-spin" />
               </div>
-              <h3 className="text-lg font-black text-slate-900">Verificando Pagamento...</h3>
-              <p className="text-xs text-slate-500 font-medium">
-                Estamos confirmando seu pagamento com o Stripe. Isso pode levar alguns segundos.
+              <h3 className="text-base font-bold text-zinc-100">Confirmando Pagamento</h3>
+              <p className="text-xs text-zinc-400 font-normal leading-relaxed">
+                Aguardando a confirmação do pagamento pelo Asaas.
               </p>
-              <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400">
-                <ShieldCheck size={13} className="text-emerald-600" />
-                <span>Processado com segurança pela Stripe</span>
+              <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500 font-mono">
+                <ShieldCheck size={13} className="text-emerald-500" />
+                <span>Pagamento seguro via Asaas</span>
               </div>
             </div>
           </div>
@@ -227,38 +181,46 @@ export default function Home() {
 
         {/* Payment Success Banner */}
         {paymentSuccessBanner && (
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg flex items-center gap-3 animate-in slide-in-from-top duration-300">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-              <CheckCircle2 size={22} />
+          <div className="p-4 rounded-lg bg-emerald-950/60 border border-emerald-800/80 text-emerald-200 flex items-center gap-3 animate-in slide-in-from-top duration-200">
+            <div className="w-8 h-8 rounded bg-emerald-900/60 flex items-center justify-center flex-shrink-0 text-emerald-400">
+              <CheckCircle2 size={18} />
             </div>
             <div>
-              <h4 className="text-sm font-black">Pagamento Confirmado! 🎉</h4>
-              <p className="text-[11px] text-white/90 font-medium">
-                Sua matrícula foi ativada com sucesso. Bons treinos!
+              <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-300">Pagamento Confirmado</h4>
+              <p className="text-xs text-emerald-400/90 font-normal mt-0.5">
+                Sua matrícula está ativa e liberada no sistema.
               </p>
             </div>
           </div>
         )}
-        <div className="flex items-center justify-between">
+
+        {/* Top Header */}
+        <header className="flex items-center justify-between pb-4 border-b border-zinc-800/80">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 text-white flex items-center justify-center font-black text-sm shadow-md border border-white">
-                {user ? user.name.slice(0, 2).toUpperCase() : <Swords size={18} />}
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white" />
+            <div className="relative w-11 h-11 rounded-full overflow-hidden border border-red-500/40 bg-black shrink-0 shadow-sm">
+              <Image
+                src="/logo_dojo.jpg"
+                alt="Fight Society Dojo"
+                width={44}
+                height={44}
+                className="w-full h-full object-cover"
+                priority
+              />
             </div>
 
             <div>
-              <span className="text-[11px] font-medium text-slate-400 block">
-                {isAdmin ? 'Painel Administrativo' : user ? 'Área do Aluno' : 'Fight Society'}
-              </span>
-              <h1 className="text-sm sm:text-base font-black text-slate-900 tracking-tight flex items-center gap-1.5">
-                {user ? user.name : 'Academia de Lutas'}
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono tracking-wider uppercase text-zinc-400">
+                  {isAdmin ? 'Painel de Controle' : user ? 'Área do Aluno' : 'Fight Society'}
+                </span>
                 {isAdmin && (
-                  <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold">
-                    Admin
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-red-500/15 text-red-400 border border-red-500/30">
+                    ADMIN
                   </span>
                 )}
+              </div>
+              <h1 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                {user ? user.name : 'Centro de Treinamento Bruno Silva'}
               </h1>
             </div>
           </div>
@@ -267,25 +229,26 @@ export default function Home() {
             {user ? (
               <button
                 onClick={logout}
-                className="p-2.5 rounded-2xl bg-white border border-slate-200/80 text-slate-400 hover:text-red-600 hover:border-red-200 transition shadow-xs"
-                title="Sair da Conta"
+                className="py-1.5 px-3 rounded-lg bg-zinc-800/60 border border-zinc-700/70 text-zinc-300 hover:text-white hover:bg-zinc-700 text-xs font-medium transition flex items-center gap-1.5"
+                title="Encerrar sessão"
               >
-                <LogOut size={18} />
+                <LogOut size={14} />
+                <span className="hidden sm:inline">Sair</span>
               </button>
             ) : (
               <button
                 onClick={handleOpenLogin}
-                className="py-2 px-3.5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-md transition"
+                className="py-1.5 px-4 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold text-xs tracking-wide transition shadow-xs"
               >
                 Entrar
               </button>
             )}
           </div>
-        </div>
+        </header>
 
         {/* TAB 1: HOME / DASHBOARD */}
         {currentTab === 'home' && (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-6 animate-in fade-in duration-200">
             {/* If Logged in Student: Member Card */}
             {user && !isAdmin && (
               <MemberCard
@@ -297,119 +260,131 @@ export default function Home() {
 
             {/* If Logged in Admin: Admin Welcome Card */}
             {user && isAdmin && (
-              <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-red-950 text-white shadow-xl border border-red-900/40 relative overflow-hidden">
-                <div className="relative z-10">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/30 text-red-400 border border-red-500/30 text-xs font-bold uppercase mb-3">
-                    <ShieldCheck size={13} />
-                    <span>Administração Geral</span>
-                  </div>
-                  <h3 className="text-xl font-black text-white leading-tight">
-                    Gestão da Academia Fight Society
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-1.5">
-                    Controle de matrículas, inadimplências, planos e faturamento Stripe.
-                  </p>
+              <div className="p-5 rounded-xl bg-[#121215] border border-zinc-800 text-zinc-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-400">
+                    SISTEMA DE GESTÃO INTEGRADO
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-300 border border-zinc-700">
+                    STATUS: OPERACIONAL
+                  </span>
                 </div>
+                <h3 className="text-base font-bold text-zinc-100">
+                  Visão Geral do Dojo
+                </h3>
+                <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                  Gerenciamento central de alunos, planos de treino, controle de acesso e conciliação financeira.
+                </p>
               </div>
             )}
 
             {/* If Not Logged in: Visitor Welcome Card */}
             {!user && (
-              <div className="p-6 rounded-3xl bg-gradient-to-br from-red-600 to-rose-700 text-white shadow-xl flex flex-col justify-between relative overflow-hidden">
-                <div className="relative z-10">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase mb-3">
-                    <Swords size={13} />
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#141418] to-[#18181f] border border-zinc-800 text-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+                <div className="flex-1">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider uppercase bg-red-500/10 text-red-400 border border-red-500/30 mb-3 font-semibold">
+                    <Swords size={11} />
                     <span>Matrículas Abertas</span>
                   </div>
-                  <h3 className="text-xl font-black text-white leading-tight">
+                  <h3 className="text-xl font-bold text-white tracking-tight">
                     Jiu Jitsu Brasileiro & Muay Thai
                   </h3>
-                  <p className="text-xs text-white/85 mt-1.5">
-                    Cadastre-se para obter seu passe de acesso e assinar seu plano.
+                  <p className="text-xs sm:text-sm text-zinc-400 mt-1.5 max-w-lg leading-relaxed">
+                    Treinamento técnico de alta performance ministrado pelo Mestre Bruno Silva. Escolha seu plano e comece a treinar hoje mesmo.
                   </p>
+                  <div className="mt-5 flex gap-2.5">
+                    <button
+                      onClick={handleOpenRegister}
+                      className="py-2.5 px-4 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold text-xs tracking-wide transition shadow-sm shadow-red-950/40"
+                    >
+                      Criar Conta
+                    </button>
+                    <button
+                      onClick={handleOpenLogin}
+                      className="py-2.5 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-semibold text-xs tracking-wide transition border border-zinc-700"
+                    >
+                      Acessar Perfil
+                    </button>
+                  </div>
                 </div>
-                <div className="mt-5 flex gap-2 relative z-10">
-                  <button
-                    onClick={handleOpenRegister}
-                    className="flex-1 py-2.5 px-4 rounded-2xl bg-black text-white font-bold text-xs shadow-md hover:bg-slate-900 transition"
-                  >
-                    Cadastrar
-                  </button>
-                  <button
-                    onClick={handleOpenLogin}
-                    className="flex-1 py-2.5 px-4 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs transition"
-                  >
-                    Entrar
-                  </button>
+
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-red-500/30 shadow-md shrink-0 bg-black">
+                  <Image
+                    src="/logo_dojo.jpg"
+                    alt="Fight Society Bruno Silva"
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
             )}
 
             <DojoDescriptionSection />
 
-            {/* Quick Action Navigation Buttons (Distinct for Student vs Admin) */}
+            {/* Quick Action Navigation Grid */}
             {isAdmin ? (
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setCurrentTab('students')}
-                  className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-2 group transition text-center"
+                  className="p-3.5 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-2 group transition text-center"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition">
-                    <Users size={18} />
+                  <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-red-400 transition">
+                    <Users size={16} />
                   </div>
-                  <span className="text-xs font-bold text-slate-800">Alunos</span>
+                  <span className="text-xs font-medium text-zinc-300">Alunos</span>
                 </button>
 
                 <button
                   onClick={() => setCurrentTab('plans')}
-                  className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-2 group transition text-center"
+                  className="p-3.5 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-2 group transition text-center"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition">
-                    <Swords size={18} />
+                  <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-red-400 transition">
+                    <Swords size={16} />
                   </div>
-                  <span className="text-xs font-bold text-slate-800">Planos</span>
+                  <span className="text-xs font-medium text-zinc-300">Planos</span>
                 </button>
 
                 <button
                   onClick={() => setCurrentTab('payments')}
-                  className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-2 group transition text-center"
+                  className="p-3.5 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-2 group transition text-center"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition">
-                    <CreditCard size={18} />
+                  <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-red-400 transition">
+                    <CreditCard size={16} />
                   </div>
-                  <span className="text-xs font-bold text-slate-800">Financeiro</span>
+                  <span className="text-xs font-medium text-zinc-300">Financeiro</span>
                 </button>
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setCurrentTab('plans')}
-                  className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-1.5 group transition text-center"
+                  className="p-3 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-1.5 group transition text-center"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition">
-                    <Swords size={17} />
+                  <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-red-400 transition">
+                    <Swords size={16} />
                   </div>
-                  <span className="text-[11px] font-bold text-slate-800">Planos</span>
+                  <span className="text-[11px] font-medium text-zinc-300">Planos</span>
                 </button>
 
                 <button
                   onClick={() => setCurrentTab('checkins')}
-                  className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-1.5 group transition text-center"
+                  className="p-3 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-1.5 group transition text-center"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition">
-                    <CalendarCheck size={17} />
+                  <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-emerald-400 transition">
+                    <CalendarCheck size={16} />
                   </div>
-                  <span className="text-[11px] font-bold text-slate-800">Check-in</span>
+                  <span className="text-[11px] font-medium text-zinc-300">Check-in</span>
                 </button>
 
                 <button
                   onClick={() => setCurrentTab('profile')}
-                  className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-red-200 flex flex-col items-center gap-1.5 group transition text-center"
+                  className="p-3 rounded-lg bg-[#121215] border border-zinc-800 hover:border-zinc-700 flex flex-col items-center gap-1.5 group transition text-center"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition">
-                    <UserIcon size={17} />
+                  <div className="w-8 h-8 rounded bg-zinc-800/80 text-zinc-300 flex items-center justify-center group-hover:text-zinc-100 transition">
+                    <UserIcon size={16} />
                   </div>
-                  <span className="text-[11px] font-bold text-slate-800">Meu Perfil</span>
+                  <span className="text-[11px] font-medium text-zinc-300">Meu Perfil</span>
                 </button>
               </div>
             )}
@@ -417,81 +392,83 @@ export default function Home() {
             {/* Recent Payments Feed */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-black text-slate-900 tracking-tight">
-                  {isAdmin ? 'Últimas Cobranças da Academia' : 'Meus Pagamentos Recentes'}
+                <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                  {isAdmin ? 'Últimas Transações' : 'Histórico de Faturamento'}
                 </h3>
                 <button
                   onClick={() => setCurrentTab('payments')}
-                  className="text-xs font-bold text-red-600 hover:underline"
+                  className="text-xs font-medium text-zinc-400 hover:text-zinc-200 transition"
                 >
-                  Ver todos
+                  Ver todos →
                 </button>
               </div>
 
               {payments.length === 0 ? (
-                <div className="p-4 bg-white rounded-2xl border border-slate-200 text-center text-xs font-medium text-slate-500">
-                  Nenhum pagamento registrado até o momento.
+                <div className="p-4 bg-[#121215] rounded-lg border border-zinc-800 text-center text-xs text-zinc-500 font-normal">
+                  Nenhum registro financeiro localizado.
                 </div>
               ) : (
-                payments.slice(0, 3).map((p) => {
-                  const isPaid = p.status === 'PAID';
-                  const isPending = p.status === 'PENDING';
+                <div className="bg-[#121215] rounded-xl border border-zinc-800 divide-y divide-zinc-800/80 overflow-hidden">
+                  {payments.slice(0, 3).map((p) => {
+                    const isPaid = p.status === 'PAID';
+                    const isPending = p.status === 'PENDING';
 
-                  return (
-                    <div
-                      key={p.id}
-                      className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                            isPaid
-                              ? 'bg-emerald-50 text-emerald-600'
-                              : isPending
-                              ? 'bg-amber-50 text-amber-600'
-                              : 'bg-rose-50 text-rose-600'
-                          }`}
-                        >
-                          {isPaid ? (
-                            <CheckCircle2 size={16} />
-                          ) : isPending ? (
-                            <Clock size={16} />
-                          ) : (
-                            <AlertTriangle size={16} />
-                          )}
+                    return (
+                      <div
+                        key={p.id}
+                        className="p-3.5 flex items-center justify-between hover:bg-zinc-800/30 transition"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-7 h-7 rounded flex items-center justify-center text-xs ${
+                              isPaid
+                                ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/60'
+                                : isPending
+                                ? 'bg-amber-950/60 text-amber-400 border border-amber-800/60'
+                                : 'bg-red-950/60 text-red-400 border border-red-800/60'
+                            }`}
+                          >
+                            {isPaid ? (
+                              <CheckCircle2 size={14} />
+                            ) : isPending ? (
+                              <Clock size={14} />
+                            ) : (
+                              <AlertTriangle size={14} />
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-medium text-zinc-200">
+                              {p.enrollment?.plan?.name || 'Assinatura Fight Society'}
+                            </h4>
+                            <span className="text-[10px] font-mono text-zinc-500">
+                              {p.paidAt
+                                ? new Date(p.paidAt).toLocaleDateString('pt-BR')
+                                : isPending
+                                ? 'Aguardando compensação'
+                                : 'Cancelado'}
+                            </span>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-slate-900">
-                            {p.enrollment?.plan?.name || 'Mensalidade Stripe'}
-                          </h4>
-                          <span className="text-[10px] text-slate-400">
-                            {p.paidAt
-                              ? new Date(p.paidAt).toLocaleDateString('pt-BR')
-                              : isPending
-                              ? 'Aguardando Pagamento'
-                              : 'Não Concluído'}
+                        <div className="text-right">
+                          <span className="text-xs font-mono font-bold text-zinc-200 block">
+                            R$ {Number(p.amount).toFixed(2)}
+                          </span>
+                          <span
+                            className={`text-[10px] font-mono uppercase ${
+                              isPaid
+                                ? 'text-emerald-400'
+                                : isPending
+                                ? 'text-amber-400'
+                                : 'text-red-400'
+                            }`}
+                          >
+                            {isPaid ? 'Liquidado' : isPending ? 'Pendente' : 'Recusado'}
                           </span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <span className="text-xs font-black text-slate-900 block">
-                          R$ {Number(p.amount).toFixed(2)}
-                        </span>
-                        <span
-                          className={`text-[10px] font-bold ${
-                            isPaid
-                              ? 'text-emerald-600'
-                              : isPending
-                              ? 'text-amber-600'
-                              : 'text-rose-600'
-                          }`}
-                        >
-                          {isPaid ? 'Pago' : isPending ? 'Pendente' : 'Recusado'}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
@@ -518,7 +495,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* TAB 4: FINANCEIRO & COBRANÇAS STRIPE (Apenas para ADMIN) */}
+        {/* TAB 4: FINANCEIRO & COBRANÇAS (Apenas para ADMIN) */}
         {currentTab === 'payments' && isAdmin && (
           <div className="animate-in fade-in duration-300">
             <PaymentsHistory />

@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BookOpen, Pencil, Plus, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { DojoDescription } from '@/types/api';
@@ -68,24 +69,30 @@ export function DojoDescriptionSection() {
   if (!dojo && !isAdmin) return null;
 
   return (
-    <section className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+    <section className="p-5 rounded-2xl bg-gradient-to-br from-[#141418] to-[#18181f] border border-zinc-800 space-y-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center">
-            <BookOpen size={19} />
+          <div className="relative w-10 h-10 rounded-full overflow-hidden border border-red-500/40 bg-black shrink-0 shadow-sm">
+            <Image
+              src="/logo_dojo.jpg"
+              alt="Fight Society"
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
-            <h2 className="text-sm font-black text-slate-900">Sobre o dojo</h2>
-            <p className="text-[11px] text-slate-400 font-medium">Conheça a Fight Society</p>
+            <h2 className="text-xs font-semibold text-zinc-300">Sobre o Centro de Treinamento</h2>
+            <p className="text-sm font-bold text-white mt-0.5">Filosofia & Metodologia Fight Society</p>
           </div>
         </div>
         {isAdmin && dojo && !editing && (
           <div className="flex items-center gap-1">
-            <button type="button" onClick={() => setEditing(true)} className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50" title="Editar descrição">
-              <Pencil size={16} />
+            <button type="button" onClick={() => setEditing(true)} className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800" title="Editar descrição">
+              <Pencil size={15} />
             </button>
-            <button type="button" onClick={handleDelete} disabled={saving} className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50" title="Excluir descrição">
-              <Trash2 size={16} />
+            <button type="button" onClick={handleDelete} disabled={saving} className="p-1.5 rounded-md text-zinc-400 hover:text-red-400 hover:bg-zinc-800" title="Excluir descrição">
+              <Trash2 size={15} />
             </button>
           </div>
         )}
@@ -96,19 +103,19 @@ export function DojoDescriptionSection() {
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="Digite a descrição do dojo..."
+            placeholder="Digite a apresentação institucional da academia..."
             rows={5}
-            className="w-full rounded-2xl border border-slate-200 p-3 text-sm text-slate-700 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 resize-y"
+            className="w-full rounded-md border border-zinc-700 bg-zinc-900/80 p-3 text-sm text-zinc-200 outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 resize-y"
           />
           <div className="flex justify-end gap-2">
-            {dojo && <button type="button" onClick={() => { setDescription(dojo.description); setEditing(false); }} className="px-3 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100">Cancelar</button>}
-            <button type="button" onClick={handleSave} disabled={saving || !description.trim()} className="px-4 py-2 rounded-xl bg-red-600 text-white text-xs font-bold hover:bg-red-500 disabled:opacity-50">
-              {saving ? 'Salvando...' : dojo ? 'Salvar alterações' : <><Plus size={14} className="inline mr-1" />Adicionar descrição</>}
+            {dojo && <button type="button" onClick={() => { setDescription(dojo.description); setEditing(false); }} className="px-3 py-1.5 rounded-md text-xs font-medium text-zinc-400 hover:bg-zinc-800 transition">Cancelar</button>}
+            <button type="button" onClick={handleSave} disabled={saving || !description.trim()} className="px-4 py-1.5 rounded-md bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition disabled:opacity-50">
+              {saving ? 'Gravando...' : dojo ? 'Salvar Alterações' : <><Plus size={13} className="inline mr-1" />Adicionar Descrição</>}
             </button>
           </div>
         </div>
       ) : (
-        <p className="text-sm leading-6 text-slate-600 whitespace-pre-wrap">{dojo.description}</p>
+        <p className="text-xs sm:text-sm leading-relaxed text-zinc-400 whitespace-pre-wrap">{dojo.description}</p>
       )}
     </section>
   );

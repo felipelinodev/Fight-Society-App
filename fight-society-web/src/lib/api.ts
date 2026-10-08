@@ -186,12 +186,16 @@ class ApiClient {
   }
 
   // ================= Payments =================
-  async createCheckout(enrollmentId: string, token: string): Promise<{ checkoutUrl: string; sessionId: string }> {
-    return this.request<{ checkoutUrl: string; sessionId: string }>(
+  async createCheckout(
+    enrollmentId: string,
+    token: string,
+    cpf?: string,
+  ): Promise<{ invoiceUrl: string; paymentId: string }> {
+    return this.request<{ invoiceUrl: string; paymentId: string }>(
       '/payments/checkout',
       {
         method: 'POST',
-        body: JSON.stringify({ enrollmentId }),
+        body: JSON.stringify({ enrollmentId, cpf }),
       },
       token,
     );
@@ -212,13 +216,28 @@ class ApiClient {
 
   async createPlanSchedule(
     planId: string,
-    data: { dayOfWeek: number; startTime: string; endTime: string; instructor?: string },
+    data: { dayOfWeek: number; startTime: string; endTime: string; instructor?: string; note?: string },
     token: string,
   ): Promise<PlanSchedule> {
     return this.request<PlanSchedule>(
       `/plans/${planId}/schedules`,
       {
         method: 'POST',
+        body: JSON.stringify(data),
+      },
+      token,
+    );
+  }
+
+  async updatePlanSchedule(
+    id: string,
+    data: { dayOfWeek?: number; startTime?: string; endTime?: string; instructor?: string; note?: string },
+    token: string,
+  ): Promise<PlanSchedule> {
+    return this.request<PlanSchedule>(
+      `/schedules/${id}`,
+      {
+        method: 'PUT',
         body: JSON.stringify(data),
       },
       token,
